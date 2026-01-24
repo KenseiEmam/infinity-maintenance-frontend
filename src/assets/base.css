@@ -1,0 +1,106 @@
+/* color palette from <https://github.com/vuejs/theme> */
+@import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+/* Define your custom theme tokens */
+@theme {
+  /* Light theme */
+  --color-primary: #121c26; /* was --color-primary */
+  --color-secondary: #3a506b; /* was --color-secondary */
+  --color-alternate: #607d8b; /* was --color-alternate */
+  --color-accent: #5f7a99; /* was --color-accent */
+  --color-primary-text: #0f141a; /* was --color-primary-text */
+  --color-secondary-text: #3c4a59; /* was --color-secondary-text */
+  --color-primary-background: #e6ebf0; /* was --color-primary-background */
+  --color-secondary-background: #fcfcfc; /* was --color-secondary-background */
+  --color-primary-streak: #4a90e2; /* was --color-primary-streak */
+  --color-primary-error: #e74c3c; /* was --color-primary-error */
+  --color-primary-success: #27ae60; /* was --color-primary-success */
+
+  /* Dark theme */
+  --color-dark-text: #fcfcfc; /* was --color-dark-text */
+  --color-dark-sectext: #e6ebf0; /* was --color-dark-sectext */
+  --color-dark-background: #121c26; /* was --color-dark-background */
+  --color-dark-secbackground: #1f2a35; /* was --color-dark-secbackground */
+
+  /* Spacing tokens (unchanged) */
+  --spacing-128: 32rem;
+  --spacing-144: 36rem;
+  --spacing-A4W: 794px;
+  --spacing-A4H: 1123px;
+  --spacing-2page: 2244px;
+  --spacing-75vh: 75vh;
+}
+
+:root {
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #052c16;
+  --vt-c-white-mute: #f2f2f2;
+  --vt-c-white-secbg: #ecf0dc;
+  --vt-c-black: #081411;
+  --vt-c-black-soft: #000503;
+  --vt-c-black-mute: #19241f;
+
+  --vt-c-indigo: ##2ebe71;
+
+  --vt-c-divider-dark-1: #f5f9df;
+  --vt-c-divider-dark-2: #9fb9b2;
+
+  --vt-c-text-dark-1: #0c1912ff;
+  --vt-c-text-dark-2: #45544e;
+}
+
+/* semantic color variables for this project */
+:root {
+  --color-background: var(--vt-c-black);
+  --color-background-soft: var(--vt-c-black-soft);
+  --color-background-mute: var(--vt-c-black-mute);
+
+  --color-border: var(--vt-c-divider-dark-2);
+  --color-border-hover: var(--vt-c-divider-dark-1);
+
+  --color-title: #bccf19;
+  --color-heading: var(--vt-c-text-dark-1);
+  --color-label: #bccf19;
+  --color-link: #b02def;
+  --color-text: var(--vt-c-text-dark-2);
+  --section-gap: 160px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+body .dark {
+  color: #0c1912ff;
+}
