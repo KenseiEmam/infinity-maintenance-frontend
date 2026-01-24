@@ -26,14 +26,8 @@ onMounted(() => {
   if (localStorage.getItem('LoggedInUser') && localStorage.getItem('UserID')) {
     console.log("route dashboard")
   }
-  loading.value = true
-  userStore.fetchUsers({role:"ADMIN"}).then(()=>{
-    if(userStore.totalCount === 0 && !userStore.totalCount)
-  {
-    console.log("Register First Admin")
-  }
-  }
-)
+
+
 })
 
 const handleLogin = async () => {
