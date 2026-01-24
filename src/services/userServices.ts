@@ -49,6 +49,19 @@ class UserServices {
    * - forgot password
    * - invited user setting password for first time
    */
+  async setupPassword(payload: {
+    userId: string
+    token: string
+    password: string
+  }): Promise<ApiResponse> {
+    try {
+      const res = await instance.post('/users/setup-password', payload)
+      return { data: res.data, error: null }
+    } catch (error: any) {
+      return { data: null, error }
+    }
+  }
+
   async resetPassword(payload: {
     userId: string
     token: string
@@ -89,7 +102,19 @@ class UserServices {
    */
   async inviteUser(payload: { name: string; email: string; role: string }): Promise<ApiResponse> {
     try {
-      const res = await instance.post('/users', payload)
+      const res = await instance.post('/users/invite', payload)
+      return { data: res.data, error: null }
+    } catch (error: any) {
+      return { data: null, error }
+    }
+  }
+  async createAdmin(payload: {
+    name: string
+    email: string
+    password: string
+  }): Promise<ApiResponse> {
+    try {
+      const res = await instance.post('/users/register-first-admin', payload)
       return { data: res.data, error: null }
     } catch (error: any) {
       return { data: null, error }

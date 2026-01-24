@@ -177,7 +177,14 @@ export const useUserStore = defineStore('user', () => {
       showError(err?.response?.data?.error || 'Password reset failed')
     }
   }
-
+  async function setupPassowrd(payload: { userId: string; token: string; password: string }) {
+    try {
+      await userServices.setupPassword(payload)
+      showSuccess('Password set up successful')
+    } catch (err: any) {
+      showError(err?.response?.data?.error || 'Password setting failed')
+    }
+  }
   return {
     // state
     loggedInUser,
@@ -188,6 +195,7 @@ export const useUserStore = defineStore('user', () => {
     fetchLogin,
     // actions
     login,
+    createAdmin,
     logout,
     fetchUsers,
     fetchUser,
@@ -196,5 +204,6 @@ export const useUserStore = defineStore('user', () => {
     deleteUser,
     forgotPassword,
     resetPassword,
+    setupPassowrd,
   }
 })
