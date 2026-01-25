@@ -2,6 +2,7 @@ import LoginVue from '@/views/LoginVue.vue'
 import HomeView from '@/views/Dashboard/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import UsersList from '@/views/Dashboard/UsersList.vue'
+import SetupPassword from '@/views/SetupPassword.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,6 +12,12 @@ const router = createRouter({
       name: 'Login',
       meta: { requiresAntiAuth: true },
       component: LoginVue,
+    },
+    {
+      path: '/setup-password',
+      name: 'setup',
+      meta: { requiresAntiAuth: true },
+      component: SetupPassword,
     },
     {
       path: '/forgot-password',
@@ -30,6 +37,7 @@ const router = createRouter({
         {
           name: 'users',
           path: 'users',
+          meta: { requiresAdmin: true },
           component: UsersList,
         },
       ],

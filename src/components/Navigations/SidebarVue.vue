@@ -7,12 +7,19 @@
       :key="reRend"
       class="mx-auto dark md:flex md:h-full flex-col hidden mt-0 text-sm md:text-base max-w-44"
     >
-      <div class="contentH-large">
-        <h2 class="title-small">Infinity Medicals</h2>
-        <h3 class="header-small">Service Portal</h3>
+      <div class="flex gap-3">
+        <img src="@/assets/logo.png" class="w-6" alt="" />
+        <div class="flex-1">
+          <h2 class="header-small">Infinity Medicals</h2>
+          <h3 class="subheader-small text-dark-sectext/60">Service Portal</h3>
+        </div>
       </div>
+
       <div class="2xl:gap-8 gap-4 my-16 2xl:my-32 flex flex-col">
-        <RouterLink :to="{ name: 'Login' }" class="flex gap-4 items-center hover:opacity-60">
+        <RouterLink
+          :to="{ name: 'dashboard-home' }"
+          class="flex gap-4 items-center hover:opacity-60"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 512 512"
@@ -25,7 +32,11 @@
           </svg>
           <p>Home</p>
         </RouterLink>
-        <RouterLink :to="{ name: 'users' }" class="flex gap-4 items-center hover:opacity-60">
+        <RouterLink
+          :to="{ name: 'users' }"
+          v-if="userStore.loggedInUser?.role === 'ADMIN'"
+          class="flex gap-4 items-center hover:opacity-60"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 640 512"
@@ -65,7 +76,11 @@
           </svg>
           <p>Calls</p>
         </RouterLink>
-        <RouterLink :to="{ name: 'Login' }" class="flex gap-4 items-center hover:opacity-60">
+        <RouterLink
+          :to="{ name: 'Login' }"
+          v-if="userStore.loggedInUser?.role === 'ADMIN'"
+          class="flex gap-4 items-center hover:opacity-60"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 448 512"
@@ -119,11 +134,14 @@
     </nav>
 
     <!-- Mobile Header -->
-    <div class="md:hidden w-full px-4 py-4 bg-background/60 backdrop-blur-lg">
+    <div class="md:hidden w-full px-4 pt-4 pb-2 bg-secondary-background/60 backdrop-blur-lg shadow">
       <div class="flex justify-between items-center text-center text-primary">
-        <div class="contentH-large text-left">
-          <h2 class="title-small">Infinity Medicals</h2>
-          <h3 class="header-small">Service Portal</h3>
+        <div class="flex gap-3 text-left">
+          <img src="@/assets/logo.png" class="h-10" alt="" />
+          <div class="flex-1 text-base">
+            <h2 class="font-black">Infinity Medicals</h2>
+            <p class="font-semibold text-secondary text-sm">Service Portal</p>
+          </div>
         </div>
 
         <div class="flex items-center gap-4">
@@ -145,19 +163,20 @@
         <nav
           v-show="isMobileMenuOpen"
           id="mobile-nav"
-          class="mobile-nav card absolute z-50 top-16 left-5 right-5 bg-background/30 backdrop-blur-lg p-4 my-4 rounded-lg"
+          class="mobile-nav card absolute z-50 top-16 left-5 right-5 bg-secondary-background p-4 my-4 rounded-lg"
           role="navigation"
           aria-label="Mobile Navigation"
         >
           <!-- mirrored links (same order as desktop) -->
           <div class="flex flex-col gap-3 w-full">
             <RouterLink
-              :to="{ name: 'Login' }"
+              :to="{ name: 'dashboard-home' }"
               class="text-base block py-2 btn-lg-outline text-center"
               >Home</RouterLink
             >
             <RouterLink
-              :to="{ name: 'Login' }"
+              :to="{ name: 'users' }"
+              v-if="userStore.loggedInUser?.role === 'ADMIN'"
               class="text-base block py-2 btn-lg-outline text-center"
               >Users</RouterLink
             >

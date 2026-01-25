@@ -4,6 +4,7 @@ import { ref } from 'vue'
 
 const props = defineProps({
   visible: Boolean,
+  loading: Boolean,
 })
 
 const emits = defineEmits(['close', 'submit'])
@@ -15,7 +16,6 @@ const user = ref({
 })
 
 const errors = ref<any>({})
-const loading = ref(false)
 
 const validateForm = () => {
   errors.value = {}
@@ -36,7 +36,6 @@ const validateForm = () => {
 }
 
 const submitForm = async () => {
-  loading.value = true
   if (!validateForm()) return
 
   // Emit the form data with the photo URL
@@ -50,8 +49,6 @@ const submitForm = async () => {
     email: '',
     role: 'ENGINEER',
   }
-
-  loading.value = false
 }
 </script>
 <template>
@@ -60,13 +57,13 @@ const submitForm = async () => {
     class="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50 max-h-screen overflow-y-auto"
     style="background-color: #000000aa"
   >
-    <div v-if="loading" class="card text-center items-center w-full space-y-4">
+    <div v-if="loading" class="card text-center items-center w-full space-y-4 max-w-128">
       <div
         class="w-8 h-8 border-4 border-primary/40 border-t-transparent rounded-full animate-spin"
       ></div>
       <p class="text-sm text-center animate-pulse">Loading user invitation..</p>
     </div>
-    <div v-else class="card bg-primary-background rounded-lg shadow p-6">
+    <div v-else class="card bg-primary-background rounded-lg shadow p-6 mx-3">
       <h2 class="contentH-small">Invite user</h2>
       <p class="text-body mb-4">
         Fill in the required details and submit to invite user to your system!
@@ -116,7 +113,7 @@ const submitForm = async () => {
         </div>
 
         <!-- Action Buttons -->
-        <div class="col-span-2 flex justify-end">
+        <div class="gap-2 flex justify-end flex-col md:flox-row">
           <button role="button" @click="$emit('close')" class="btn-lg-outline rounded mr-2">
             Cancel
           </button>

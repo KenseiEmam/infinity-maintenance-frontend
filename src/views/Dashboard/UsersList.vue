@@ -21,7 +21,7 @@ const filter = ref(<Filter>{
 const page = ref(1)
 const pageSize = ref(10)
 const addingUser = ref(false)
-
+const modalLoad = ref(false)
 const totalPages = computed(() => Math.ceil(userStore.totalCount / pageSize.value))
 
 // Change filter
@@ -36,7 +36,9 @@ async function toggleRole(user: any) {
 
   loading.value = true
   await userStore.updateUser(user.id, { role: newRole }).then(() => {
-    loading.value = false
+    userStore.fetchUsers(filter.value, page.value, pageSize.value).finally(() => {
+      loading.value = false
+    })
   })
 }
 
@@ -61,8 +63,14 @@ onMounted(() => {
 })
 
 const handleInvite = (event: any) => {
+  loading.value = true
+  modalLoad.value = true
   userStore.inviteUser(event).then(() => {
     addingUser.value = false
+    modalLoad.value = false
+    userStore.fetchUsers(filter.value, page.value, pageSize.value).finally(() => {
+      loading.value = false
+    })
   })
 }
 
@@ -172,6 +180,11 @@ function prevPage() {
         </button>
       </div>
     </div>
-    <AddUserModal @submit="handleInvite" @close="addingUser = false" :visible="addingUser" />
+    <AddUserModal
+      @submit="handleInvite"
+      @close="addingUser = false"
+      :visible="addingUser"
+      :loading="modalLoad"
+    />
   </section>
 </template>

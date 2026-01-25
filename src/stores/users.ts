@@ -59,6 +59,7 @@ export const useUserStore = defineStore('user', () => {
       const data = await userServices.fetchUser(id)
       loggedInUser.value = data
       localStorage.setItem('UserID', data.id)
+      localStorage.setItem('role', data.role)
       return data
     } catch (err: any) {
       showError(getErrorMessage(err.response.data.error, 'Failed to fetch user'))
@@ -71,7 +72,7 @@ export const useUserStore = defineStore('user', () => {
       token.value = data.token
       localStorage.setItem('token', data.token)
       localStorage.setItem('UserID', data.user.id)
-
+      localStorage.setItem('role', data.role)
       showSuccess('Logged in successfully')
       return data.user
     } catch (err: any) {
