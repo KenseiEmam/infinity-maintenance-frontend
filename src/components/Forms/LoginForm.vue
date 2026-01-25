@@ -2,10 +2,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-
+import router from '@/router'
 import { useUserStore } from '@/stores/users'
 
-import userServices from '@/services/userServices'
 
 const email = ref('')
 const password = ref('')
@@ -24,7 +23,7 @@ function obfuscateToggle() {
 
 onMounted(() => {
   if (localStorage.getItem('LoggedInUser') && localStorage.getItem('UserID')) {
-    console.log("route dashboard")
+    router.push({name:'dashboard-home'})
   }
 
 
@@ -33,16 +32,12 @@ onMounted(() => {
 const handleLogin = async () => {
   try {
     loading.value = true
-    const { data, error } = await userServices.login({email:email.value, password:password.value})
-
-    if (error) throw new Error(error)
-
-    const returnedData = data.user
-
-    await userStore.fetchLogin(returnedData).then(() => {
-      // router.push({ name: 'home' })
-      console.log("Logged In")
+    await userStore.login(email.value,password.value).then(()=>{
+       router.push({ name: 'dashboard-home' })
     })
+
+
+
   } catch (error: any) {
     alert(error.response?.data?.error || error.message || 'Login failed')
   } finally {
@@ -82,7 +77,7 @@ const handleLogin = async () => {
             @click="obfuscateToggle"
             class="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:opacity-30"
           >
-            <img :src="`/${eyeSvg}.svg`" class="w-6 cursor-pointer" alt="toggle visibility" />
+            <img :src="`/${eyeSvg}.svg`" class="w-6 cursor-pointer invert-[100%] dark:invert-[0%]" alt="toggle visibility" />
           </button>
         </div>
       </div>

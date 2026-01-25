@@ -8,15 +8,14 @@ const instance = axios.create({
     'x-api-key': import.meta.env.VITE_API_KEY,
   },
 })
-// instance.interceptors.request.use(
-//   (config) => {
-//     const user = JSON.parse(localStorage.getItem('auth') || '')
-//     if (user) {
-//       config.headers.Authorization = `Bearer ${user.access_token}`
-//     }
-//     return config
-//   },
-//   (error) => Promise.reject(error),
-// )
+instance.interceptors.request.use(
+  (response) => response,
+  (error) => {
+    const backendMessage = error?.response?.data?.error || error?.response?.data?.message
+
+    // 🔥 force replace AxiosError completely
+    return Promise.reject(new Error(backendMessage || 'Unauthorized'))
+  },
+)
 
 export default instance

@@ -1,142 +1,66 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import instance from './axiosClient'
 
-interface ApiResponse<T = any> {
-  data: T | null
-  error: any | null
-}
-
-interface ListResponse<T = any> {
-  users: T[]
-  count: number
-  error: any | null
-}
-
 class UserServices {
   /* ================= AUTH ================= */
 
-  async login(payload: { email: string; password: string }): Promise<ApiResponse> {
-    try {
-      const res = await instance.post('/users/login', payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async login(payload: { email: string; password: string }) {
+    const res = await instance.post('/users/login', payload)
+    return res.data
   }
 
-  async register(payload: { name: string; email: string; password: string }): Promise<ApiResponse> {
-    try {
-      const res = await instance.post('/users/register-first-admin', payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async register(payload: { name: string; email: string; password: string }) {
+    const res = await instance.post('/users/register-first-admin', payload)
+    return res.data
   }
 
   /* ================= PASSWORD ================= */
 
-  async forgotPassword(payload: { email: string }): Promise<ApiResponse> {
-    try {
-      const res = await instance.post('/users/forgot-password', payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async forgotPassword(payload: { email: string }) {
+    const res = await instance.post('/users/forgot-password', payload)
+    return res.data
   }
 
-  /**
-   * Used for BOTH:
-   * - forgot password
-   * - invited user setting password for first time
-   */
-  async setupPassword(payload: {
-    userId: string
-    token: string
-    password: string
-  }): Promise<ApiResponse> {
-    try {
-      const res = await instance.post('/users/setup-password', payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async setupPassword(payload: { userId: string; token: string; password: string }) {
+    const res = await instance.post('/users/setup-password', payload)
+    return res.data
   }
 
-  async resetPassword(payload: {
-    userId: string
-    token: string
-    newPassword: string
-  }): Promise<ApiResponse> {
-    try {
-      const res = await instance.post('/users/reset-password', payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async resetPassword(payload: { userId: string; token: string; newPassword: string }) {
+    const res = await instance.post('/users/reset-password', payload)
+    return res.data
   }
 
   /* ================= USERS ================= */
 
-  async fetchUser(id: string): Promise<ApiResponse> {
-    try {
-      const res = await instance.get(`/users/${id}`)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async fetchUser(id: string) {
+    const res = await instance.get(`/users/${id}`)
+    return res.data
   }
 
-  async fetchUsers(params: any): Promise<ListResponse> {
-    try {
-      const res = await instance.get('/users', { params })
-      return { users: res.data.users, count: res.data.count, error: null }
-    } catch (error: any) {
-      return { users: [], count: 0, error }
-    }
+  async fetchUsers(params: any) {
+    const res = await instance.get('/users', { params })
+    return res.data
   }
 
-  /**
-   * ADMIN INVITES USER
-   * - Creates user with NO password
-   * - Backend sends setup email
-   */
-  async inviteUser(payload: { name: string; email: string; role: string }): Promise<ApiResponse> {
-    try {
-      const res = await instance.post('/users/invite', payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
-  }
-  async createAdmin(payload: {
-    name: string
-    email: string
-    password: string
-  }): Promise<ApiResponse> {
-    try {
-      const res = await instance.post('/users/register-first-admin', payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async inviteUser(payload: { name: string; email: string; role: string }) {
+    const res = await instance.post('/users/invite', payload)
+    return res.data
   }
 
-  async updateUser(id: string, payload: any): Promise<ApiResponse> {
-    try {
-      const res = await instance.patch(`/users/${id}`, payload)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async createAdmin(payload: { name: string; email: string; password: string }) {
+    const res = await instance.post('/users/register-first-admin', payload)
+    return res.data
   }
 
-  async deleteUser(id: string): Promise<ApiResponse> {
-    try {
-      const res = await instance.delete(`/users/${id}`)
-      return { data: res.data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
-    }
+  async updateUser(id: string, payload: any) {
+    const res = await instance.patch(`/users/${id}`, payload)
+    return res.data
+  }
+
+  async deleteUser(id: string) {
+    const res = await instance.delete(`/users/${id}`)
+    return res.data
   }
 }
 

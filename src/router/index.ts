@@ -1,5 +1,7 @@
 import LoginVue from '@/views/LoginVue.vue'
+import HomeView from '@/views/Dashboard/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import UsersList from '@/views/Dashboard/UsersList.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,12 +9,30 @@ const router = createRouter({
     {
       path: '',
       name: 'Login',
+      meta: { requiresAntiAuth: true },
       component: LoginVue,
     },
     {
       path: '/forgot-password',
       name: 'forgot-password',
       component: LoginVue,
+    },
+
+    {
+      path: '/dashboard',
+      meta: { requiresAuth: true },
+      children: [
+        {
+          name: 'dashboard-home',
+          path: '',
+          component: HomeView,
+        },
+        {
+          name: 'users',
+          path: 'users',
+          component: UsersList,
+        },
+      ],
     },
   ],
   scrollBehavior(to, from, savedPosition) {
@@ -36,13 +56,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('UserID')
   const role = localStorage.getItem('role') // ADMIN | ENGINEER
 
   // 🔐 Requires login
   if (to.meta.requiresAuth && !token) {
     return {
-      path: '/login',
+      path: '',
       query: { redirect: to.fullPath },
     }
   }

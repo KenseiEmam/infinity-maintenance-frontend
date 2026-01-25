@@ -25,23 +25,21 @@ const isDashboard = computed(() => route.path.startsWith('/dashboard'))
 </script>
 
 <template>
-  <div v-if="!isAuth && isDashboard"  class="md:flex w-full min-h-screen max-w-screen bg-primary-background">
-      <SidebarVue />
-      <div
-        class="content-box flex-1 md:py-20 py-10 max-h-screen overflow-y-auto text-center md:text-left"
-      >
-        <RouterView />
-      </div>
+  <div
+    v-if="!isAuth && isDashboard"
+    class="md:flex-row flex flex-col w-full min-h-screen max-w-screen bg-primary-background relative"
+  >
+    <SidebarVue />
+    <div
+      class="content-box flex-1 md:py-20 py-10 max-h-screen overflow-y-auto text-center md:text-left"
+    >
+      <RouterView />
     </div>
+  </div>
   <div v-else class="w-full min-h-screen max-w-screen bg-primary-background">
     <!-- Only render header/footer if not dashboard or auth routes -->
-    <div  >
-
+    <div>
       <RouterView />
-
-
     </div>
-
-
   </div>
 </template>
