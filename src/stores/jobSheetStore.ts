@@ -30,11 +30,19 @@ function showSuccess(message: string) {
 export interface JobSheet {
   id?: string
   customerId?: string
+  customerSignature?: string
+  checkInTime?: Date
+  arrivalTime?: Date
+  completionTime?: Date
+  labourTimeMin?: number
   machineId?: string
   engineerId?: string
   createdAt?: string
   updatedAt?: string
-  // add other fields if needed
+  problemFound?: string
+  workReport?: string
+  total?: number
+  totalAfterDisc?: number
   customer?: any
   machine?: any
   engineer?: any

@@ -6,6 +6,7 @@ import SetupPassword from '@/views/SetupPassword.vue'
 import SheetList from '@/views/Dashboard/Sheets/sheetList.vue'
 import CustomerList from '@/views/Dashboard/CustomerList.vue'
 import MachineList from '@/views/Dashboard/MachineList.vue'
+import SingleSheet from '@/views/Dashboard/Sheets/singleSheet.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,10 +52,20 @@ const router = createRouter({
           component: CustomerList,
         },
         {
-          name: 'job-sheets',
           path: 'sheets',
           meta: { requiresAdmin: true },
-          component: SheetList,
+          children: [
+            {
+              path: '',
+              name: 'job-sheets',
+              component: SheetList,
+            },
+            {
+              path: ':id',
+              name: 'single-sheet',
+              component: SingleSheet,
+            },
+          ],
         },
 
         {

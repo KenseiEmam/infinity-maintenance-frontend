@@ -131,6 +131,12 @@ function prevPage() {
               })
             }}
           </p>
+          <button
+            class="btn-sm-outline"
+            @click="$router.push({ name: 'single-sheet', params: { id: jobSheet.id } })"
+          >
+            View Sheet
+          </button>
         </div>
       </div>
 

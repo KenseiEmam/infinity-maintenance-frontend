@@ -2,8 +2,8 @@
 import instance from './axiosClient'
 
 class MachineServices {
-  async fetchMachines(params: any, page: number, pageSize: number) {
-    const res = await instance.get('/machines', { params, page, pageSize })
+  async fetchMachines(params?: any) {
+    const res = await instance.get('/machines', { params })
     return res.data
   }
 
