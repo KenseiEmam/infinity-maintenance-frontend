@@ -65,10 +65,11 @@ export const useJobSheetStore = defineStore('jobSheet', () => {
 
   /* ================= CRUD ================= */
 
-  async function fetchJobSheets(filters: Filters = {}) {
+  async function fetchJobSheets(filters: Filters = {}, page = 1, pageSize = 10) {
     try {
-      const data = await jobSheetServices.fetchJobSheets(filters)
-      jobSheets.value = data
+      const data = await jobSheetServices.fetchJobSheets(filters, page, pageSize)
+      jobSheets.value = data.jobSheets
+      totalCount.value = data.count
     } catch (err: any) {
       showError(getErrorMessage(err, 'Failed to fetch job sheets'))
     }

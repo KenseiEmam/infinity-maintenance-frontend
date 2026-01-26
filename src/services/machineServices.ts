@@ -2,8 +2,8 @@
 import instance from './axiosClient'
 
 class MachineServices {
-  async fetchMachines(params?: any) {
-    const res = await instance.get('/machines', { params })
+  async fetchMachines(params: any, page: number, pageSize: number) {
+    const res = await instance.get('/machines', { params, page, pageSize })
     return res.data
   }
 
@@ -29,6 +29,32 @@ class MachineServices {
 
   async deleteMachine(id: string) {
     const res = await instance.delete(`/machines/${id}`)
+    return res.data
+  }
+
+  /* ---------------- MANUFACTURERS ---------------- */
+
+  async fetchManufacturers() {
+    const res = await instance.get('/manufacturers')
+    return res.data
+  }
+
+  async createManufacturer(payload: { name: string }) {
+    const res = await instance.post('/manufacturers', payload)
+    return res.data
+  }
+
+  /* ---------------- MODELS ---------------- */
+
+  async fetchModels(manufacturerId?: string) {
+    const res = await instance.get('/models', {
+      params: manufacturerId ? { manufacturerId } : undefined,
+    })
+    return res.data
+  }
+
+  async createModel(payload: { name: string; manufacturerId: string }) {
+    const res = await instance.post('/models', payload)
     return res.data
   }
 }

@@ -173,7 +173,7 @@ function prevPage() {
         <button
           @click="nextPage"
           :disabled="page === totalPages"
-          v-if="page !== totalPages"
+          v-if="page < totalPages"
           class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
           Next

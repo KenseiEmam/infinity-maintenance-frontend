@@ -29,8 +29,8 @@ type Filters = {
 }
 
 class JobSheetServices {
-  async fetchJobSheets(filters: Filters = {}) {
-    const res = await instance.get('/job-sheets', { params: filters })
+  async fetchJobSheets(filters: Filters = {}, page: number, pageSize: number) {
+    const res = await instance.get('/job-sheets', { params: { filters, pageSize, page } })
     return res.data
   }
 

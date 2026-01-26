@@ -43,14 +43,31 @@ export interface Machine {
   scheduledVisits?: any[]
 }
 
+export interface Manufacturer {
+  id: string
+  name: string
+}
+
+export interface Model {
+  id: string
+  name: string
+  manufacturerId: string
+  manufacturer?: Manufacturer
+}
 export const useMachineStore = defineStore('machine', () => {
   const machines = ref<Machine[]>([])
   const machineDetail = ref<Machine | null>(null)
   const totalCount = ref(0)
+  const manufacturers = ref<Manufacturer[]>([])
+  const models = ref<Model[]>([])
 
-  async function fetchMachines(filters: any = {}) {
+  async function fetchMachines(filters: any = {}, page = 1, pageSize = 10) {
     try {
-      const data = await machineServices.fetchMachines(filters)
+      const params: any = { page, pageSize }
+
+      if (filters.role) params.role = filters.role
+      if (filters.name) params.name = filters.name
+      const data = await machineServices.fetchMachines(params)
       machines.value = data
     } catch (err: any) {
       showError(err?.response?.data?.error || 'Failed to fetch machines')
@@ -105,15 +122,61 @@ export const useMachineStore = defineStore('machine', () => {
       showError(err?.response?.data?.error || 'Failed to delete machine')
     }
   }
+  /* ---------------- MANUFACTURERS ---------------- */
 
+  async function fetchManufacturers() {
+    try {
+      manufacturers.value = await machineServices.fetchManufacturers()
+    } catch {
+      showError('Failed to fetch manufacturers')
+    }
+  }
+
+  async function createManufacturer(name: string) {
+    try {
+      const data = await machineServices.createManufacturer({ name })
+      manufacturers.value.push(data)
+      showSuccess('Manufacturer created')
+      return data
+    } catch {
+      showError('Failed to create manufacturer')
+    }
+  }
+
+  /* ---------------- MODELS ---------------- */
+
+  async function fetchModels(manufacturerId?: string) {
+    try {
+      models.value = await machineServices.fetchModels(manufacturerId)
+    } catch {
+      showError('Failed to fetch models')
+    }
+  }
+
+  async function createModel(payload: { name: string; manufacturerId: string }) {
+    try {
+      const data = await machineServices.createModel(payload)
+      models.value.push(data)
+      showSuccess('Model created')
+      return data
+    } catch {
+      showError('Failed to create model')
+    }
+  }
   return {
     machines,
     machineDetail,
     totalCount,
+    manufacturers,
+    models,
     fetchMachines,
     fetchMachine,
     createMachine,
     updateMachine,
     deleteMachine,
+    fetchManufacturers,
+    createManufacturer,
+    fetchModels,
+    createModel,
   }
 })

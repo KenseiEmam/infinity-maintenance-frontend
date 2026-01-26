@@ -8,6 +8,7 @@ export interface Customer {
   id?: string
   name: string
   address?: string
+  phone?: string
   createdAt?: string
   updatedAt?: string
 }
@@ -39,17 +40,18 @@ function showSuccess(message: string) {
 export const useCustomerStore = defineStore('customer', () => {
   const customers = ref<Customer[]>([])
   const customerDetail = ref<Customer | null>(null)
-
+  const totalCount = ref(0) // optional, in case you add pagination
   function getErrorMessage(err: any, fallback = 'Something went wrong') {
     return err?.response?.data?.error || err?.message || fallback
   }
 
   /* ================= CRUD ================= */
 
-  async function fetchCustomers() {
+  async function fetchCustomers(page = 1, pageSize = 10) {
     try {
-      const data = await customerServices.fetchCustomers()
-      customers.value = data
+      const data = await customerServices.fetchCustomers(page, pageSize)
+      customers.value = data.customers
+      totalCount.value = data.count
     } catch (err: any) {
       showError(getErrorMessage(err, 'Failed to fetch customers'))
     }
@@ -65,7 +67,7 @@ export const useCustomerStore = defineStore('customer', () => {
     }
   }
 
-  async function createCustomer(payload: { name: string; address?: string }) {
+  async function createCustomer(payload: { name: string; address?: string; phone?: string }) {
     try {
       const data = await customerServices.createCustomer(payload)
       customers.value.unshift(data)
@@ -75,12 +77,28 @@ export const useCustomerStore = defineStore('customer', () => {
       showError(getErrorMessage(err, 'Failed to create customer'))
     }
   }
-
+  async function updateCustomer(payload: {
+    id: string
+    name: string
+    address?: string
+    phone?: string
+  }) {
+    try {
+      const data = await customerServices.updateCustomer(payload)
+      customers.value.unshift(data)
+      showSuccess('Customer created successfully')
+      return data
+    } catch (err: any) {
+      showError(getErrorMessage(err, 'Failed to create customer'))
+    }
+  }
   return {
     customers,
     customerDetail,
+    totalCount,
     fetchCustomers,
     fetchCustomer,
     createCustomer,
+    updateCustomer,
   }
 })
