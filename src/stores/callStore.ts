@@ -35,29 +35,38 @@ export interface Call {
   assignedToId?: string
   assignedAt?: string
   callTime?: string
-  customer?: { id: string; name: string }
-  machine?: { id: string; serialNumber: string }
+  customer?: { id: string; name: string; phone: string; address: string }
+  machine?: { id: string; serialNumber: string; underWarranty: boolean }
   assignedTo?: { id: string; name: string; email: string }
 }
 export const useCallStore = defineStore('call', () => {
   const calls = ref<Call[]>([])
   const callDetail = ref<Call | null>(null)
-
+  const totalCount = ref(0) // optional, in case you add pagination
   function getErrorMessage(err: any, fallback = 'Something went wrong') {
     return err?.response?.data?.error || err?.message || fallback
   }
 
   /* ================= CRUD ================= */
 
-  async function fetchCalls() {
+  async function fetchCalls(page = 1, pageSize = 10) {
     try {
-      const data = await callServices.fetchCalls()
-      calls.value = data
+      const data = await callServices.fetchCalls(page, pageSize)
+      calls.value = data.calls
+      totalCount.value = data.count
     } catch (err: any) {
       showError(getErrorMessage(err, 'Failed to fetch calls'))
     }
   }
-
+  async function fetchCall(id: string) {
+    try {
+      const data = await callServices.fetchCall(id)
+      callDetail.value = data
+      return data
+    } catch (err: any) {
+      showError(getErrorMessage(err, 'Failed to fetch job sheet'))
+    }
+  }
   async function createCall(payload: {
     customerId: string
     machineId?: string
@@ -89,7 +98,9 @@ export const useCallStore = defineStore('call', () => {
   return {
     calls,
     callDetail,
+    totalCount,
     fetchCalls,
+    fetchCall,
     createCall,
     assignCall,
   }

@@ -7,6 +7,9 @@ import SheetList from '@/views/Dashboard/Sheets/sheetList.vue'
 import CustomerList from '@/views/Dashboard/CustomerList.vue'
 import MachineList from '@/views/Dashboard/MachineList.vue'
 import SingleSheet from '@/views/Dashboard/Sheets/singleSheet.vue'
+import CallList from '@/views/Dashboard/Calls/callList.vue'
+import SingleCall from '@/views/Dashboard/Calls/singleCall.vue'
+import ScheduleVisits from '@/views/Dashboard/ScheduleVisits.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,7 +47,12 @@ const router = createRouter({
           meta: { requiresAdmin: true },
           component: UsersList,
         },
-
+        {
+          name: 'visits',
+          path: 'visits',
+          meta: { requiresAdmin: true },
+          component: ScheduleVisits,
+        },
         {
           name: 'customers',
           path: 'customers',
@@ -67,7 +75,22 @@ const router = createRouter({
             },
           ],
         },
-
+        {
+          path: 'calls',
+          meta: { requiresAdmin: true },
+          children: [
+            {
+              path: '',
+              name: 'calls',
+              component: CallList,
+            },
+            {
+              path: ':id',
+              name: 'single-call',
+              component: SingleCall,
+            },
+          ],
+        },
         {
           name: 'machines',
           path: 'machines',

@@ -77,6 +77,7 @@ export const useCustomerStore = defineStore('customer', () => {
       showError(getErrorMessage(err, 'Failed to create customer'))
     }
   }
+
   async function updateCustomer(payload: {
     id: string
     name: string

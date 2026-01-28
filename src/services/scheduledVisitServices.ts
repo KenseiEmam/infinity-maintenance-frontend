@@ -18,8 +18,8 @@ export interface ScheduledVisit {
 }
 
 class ScheduledVisitServices {
-  async fetchVisits() {
-    const res = await instance.get('/scheduled-visits')
+  async fetchVisits(visitDate: string, page: number, pageSize: number) {
+    const res = await instance.get('/scheduled-visits', { params: { visitDate, page, pageSize } })
     return res.data
   }
 

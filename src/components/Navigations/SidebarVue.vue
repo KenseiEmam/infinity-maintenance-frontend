@@ -63,7 +63,7 @@
 
           <p>Jobsheets</p>
         </RouterLink>
-        <RouterLink :to="{ name: 'Login' }" class="flex gap-4 items-center hover:opacity-60">
+        <RouterLink :to="{ name: 'calls' }" class="flex gap-4 items-center hover:opacity-60">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 512 512"
@@ -94,7 +94,7 @@
           <p>Customers</p>
         </RouterLink>
         <RouterLink
-          :to="{ name: 'Login' }"
+          :to="{ name: 'visits' }"
           v-if="userStore.loggedInUser?.role === 'ADMIN'"
           class="flex gap-4 items-center hover:opacity-60"
         >
@@ -203,7 +203,7 @@
               >Job Sheets</RouterLink
             >
             <RouterLink
-              :to="{ name: 'Login' }"
+              :to="{ name: 'calls' }"
               class="text-base block py-2 btn-lg-outline text-center"
               >Calls</RouterLink
             >
@@ -214,7 +214,7 @@
               >Customers</RouterLink
             >
             <RouterLink
-              :to="{ name: 'Login' }"
+              :to="{ name: 'visits' }"
               class="text-base block py-2 btn-lg-outline text-center"
               >Visits</RouterLink
             >

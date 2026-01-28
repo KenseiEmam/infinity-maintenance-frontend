@@ -47,17 +47,18 @@ export interface ScheduledVisit {
 export const useScheduledVisitStore = defineStore('scheduledVisit', () => {
   const visits = ref<ScheduledVisit[]>([])
   const visitDetail = ref<ScheduledVisit | null>(null)
-
+  const totalCount = ref(0) // optional, in case you add pagination
   function getErrorMessage(err: any, fallback = 'Something went wrong') {
     return err?.response?.data?.error || err?.message || fallback
   }
 
   /* ================= CRUD ================= */
 
-  async function fetchVisits() {
+  async function fetchVisits(visitDate: string, page = 1, pageSize = 10) {
     try {
-      const data = await scheduledVisitServices.fetchVisits()
-      visits.value = data
+      const data = await scheduledVisitServices.fetchVisits(visitDate, page, pageSize)
+      visits.value = data.visits
+      totalCount.value = data.count
     } catch (err: any) {
       showError(getErrorMessage(err, 'Failed to fetch scheduled visits'))
     }
@@ -110,6 +111,7 @@ export const useScheduledVisitStore = defineStore('scheduledVisit', () => {
   return {
     visits,
     visitDetail,
+    totalCount,
     fetchVisits,
     fetchVisit,
     createVisit,

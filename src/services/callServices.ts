@@ -14,11 +14,15 @@ export interface Call {
 }
 
 class CallServices {
-  async fetchCalls() {
-    const res = await instance.get('/calls')
+  async fetchCalls(page: number, pageSize: number) {
+    const res = await instance.get('/calls', { params: { page, pageSize } })
     return res.data
   }
 
+  async fetchCall(id: string) {
+    const res = await instance.get(`/calls/${id}`)
+    return res.data
+  }
   async createCall(payload: { customerId: string; machineId?: string; description: string }) {
     const res = await instance.post('/calls', payload)
     return res.data

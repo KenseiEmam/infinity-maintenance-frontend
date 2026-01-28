@@ -1,33 +1,26 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-import { useUserStore } from '@/stores/users'
+import { useMachineStore } from '@/stores/machineStore'
 import { onMounted, ref } from 'vue'
 
 const props = defineProps({
   visible: Boolean,
+  loading: Boolean,
 })
-const loading = ref(true)
+const loadingMachs = ref(true)
 const emits = defineEmits(['close', 'submit'])
 
-const meal = ref<number[]>([])
 const user = ref<any>(undefined) // ✅ start empty
 const errors = ref<any>({
-  meal: ['', '', '', '', '', ''],
   user: '',
 })
 
-const userStore = useUserStore()
+const machineStore = useMachineStore()
 const validateForm = () => {
   errors.value = { meal: ['', '', '', '', '', ''], user: '' }
 
   if (!user.value) {
     errors.value.user = 'Please state your user!'
-  }
-  for (let i = 0; i < user.value.noMeals; i++) {
-    if (!meal.value[i]) {
-      errors.value.meal[i] =
-        i < 5 ? `Please choose your ${i + 1} meal!` : 'Please state your snack meal!'
-    }
   }
 
   // return true if no errors
@@ -35,8 +28,8 @@ const validateForm = () => {
 }
 
 onMounted(() => {
-  userStore.fetchUsers({ role: 'ENGINEER' }, 1, 10000).then(() => {
-    loading.value = false
+  machineStore.fetchMachines({}, 1, 10000).then(() => {
+    loadingMachs.value = false
   })
 })
 
@@ -58,27 +51,25 @@ const submitForm = async () => {
     style="background-color: #000000aa"
   >
     <div
-      v-if="userStore.users && !loading"
+      v-if="machineStore.machines && !loadingMachs && !loading"
       class="card bg-primary-background rounded-lg shadow p-6"
     >
-      <h2 class="contentH-small">Assign a Engineer to this Order</h2>
-      <p class="text-body mb-4">
-        Choose your preferred Engineer from the list below to assign him to this order!
-      </p>
+      <h2 class="contentH-small">Assign a Machine to this Visit</h2>
+      <p class="text-body mb-4">Choose the machine related to this visit!</p>
       <form @submit.prevent="submitForm" class="w-full">
         <div>
           <!-- Type field -->
           <div class="mb-4">
-            <label for="type" class="block text-sm font-medium"> Customer User </label>
+            <label for="type" class="block text-sm font-medium"> Machine User </label>
             <select
               id="type"
               v-model="user"
               class="chef-text-input"
               :class="{ 'border-red-500': errors.type }"
             >
-              <option :value="undefined" disabled>Select Engineer</option>
-              <option v-for="users in userStore.users" :key="users.id" :value="users">
-                {{ users.name }} | {{ users.email }} .
+              <option :value="undefined" disabled>Select Machine</option>
+              <option v-for="machine in machineStore.machines" :key="machine.id" :value="machine">
+                {{ machine.serialNumber }} | {{ machine.customer.name }} .
               </option>
             </select>
             <span v-if="errors.type" class="text-red-500 text-sm">{{ errors.type }}</span>
@@ -88,10 +79,10 @@ const submitForm = async () => {
         <!-- Action Buttons -->
         <div class="col-span-2 flex justify-end">
           <button type="button" @click="$emit('close')" class="btn-lg-outline mr-2">Cancel</button>
-          <button type="submit" class="btn-lg">Assign Engineer</button>
+          <button type="submit" class="btn-lg">Book Visit</button>
         </div>
       </form>
     </div>
-    <p v-else class="text-body text-center animate pulse">Loading Users</p>
+    <p v-else class="text-body text-center animate pulse">Loading Data...</p>
   </div>
 </template>
