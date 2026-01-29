@@ -2,12 +2,47 @@
 <script setup lang="ts">
 import { useJobSheetStore } from '@/stores/jobSheetStore'
 import Swal from 'sweetalert2'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed, type ComponentPublicInstance } from 'vue'
 import { useRoute } from 'vue-router'
-// import VueSignaturePad from 'vue-signature-pad'
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+import Vue3Signature from 'vue3-signature'
+
+import AddSparePartModal from '@/components/Modals/AddSparePartModal.vue'
+import AddLaserDataModal from '@/components/Modals/AddLaserDataModal.vue'
+
 const jobSheetStore = useJobSheetStore()
 const loading = ref(true)
 const uploading = ref(false)
+
+const addSparePartOpen = ref(false)
+const addLaserDataOpen = ref(false)
+
+type Vue3SignatureExposed = {
+  clear: () => void
+  save: () => string // returns base64 png data url
+}
+
+const signaturePad = ref<ComponentPublicInstance<Vue3SignatureExposed> | null>(null)
+const clearSignature = () => {
+  signaturePad.value?.clear()
+  if (jobSheetStore.jobSheetDetail) jobSheetStore.jobSheetDetail.customerSignature = null as any
+}
+
+const saveSignature = () => {
+  const dataUrl = signaturePad.value?.save()
+
+  if (!dataUrl) {
+    Swal.fire('Empty signature', 'Please sign before saving.', 'warning')
+    return
+  }
+
+  if (jobSheetStore.jobSheetDetail) {
+    jobSheetStore.jobSheetDetail.customerSignature = dataUrl as any
+  }
+
+  Swal.fire('Saved', 'Signature captured successfully.', 'success')
+}
 
 async function uploadFile(e: Event) {
   const input = e.target as HTMLInputElement
@@ -17,9 +52,7 @@ async function uploadFile(e: Event) {
   if (!jobSheetStore.jobSheetDetail?.id) return
 
   uploading.value = true
-
   await jobSheetStore.uploadAttachment(file, jobSheetStore.jobSheetDetail.id)
-
   uploading.value = false
   input.value = ''
 }
@@ -27,6 +60,36 @@ async function uploadFile(e: Event) {
 // route
 const route = useRoute()
 const changed = ref(false)
+// ---- time helpers ----
+const calcLabourMinutes = () => {
+  const arrival = jobSheetStore.jobSheetDetail?.arrivalTime
+  const completion = jobSheetStore.jobSheetDetail?.completionTime
+
+  if (!arrival || !completion) return null
+
+  const a = new Date(arrival).getTime()
+  const c = new Date(completion).getTime()
+
+  if (Number.isNaN(a) || Number.isNaN(c)) return null
+  if (c < a) return null
+
+  return Math.round((c - a) / 60000) // minutes
+}
+
+// Auto-calc labour time whenever arrival/completion changes
+watch(
+  () => [jobSheetStore.jobSheetDetail?.arrivalTime, jobSheetStore.jobSheetDetail?.completionTime],
+  () => {
+    if (!jobSheetStore.jobSheetDetail) return
+
+    const mins = calcLabourMinutes()
+    if (mins === null) return
+
+    jobSheetStore.jobSheetDetail.labourTimeMin = mins
+  },
+  { deep: true },
+)
+
 onMounted(() => {
   if (!route.params.id) {
     Swal.fire('Error', 'No sheet ID provided', 'error')
@@ -52,46 +115,75 @@ watch(
   },
   { deep: true },
 )
+
 const handleReset = () => {
   if (!route.params.id) {
     Swal.fire('Error', 'No sheet ID provided', 'error')
     return
   }
   loading.value = true
-  loading.value = true
   jobSheetStore.fetchJobSheet(route.params.id.toString()).finally(() => {
     loading.value = false
     changed.value = false
   })
 }
-// const signaturePad = ref<any>(null)
-// function clearSignature() {
-//   if (!signaturePad.value) return
-//   signaturePad.value.clearSignature()
-// }
 
-// async function saveSignature() {
-//   if (!signaturePad.value || !jobSheetStore.jobSheetDetail?.id) return
+// ---- totals ----
+const sparePartsTotal = computed(() => {
+  const parts = jobSheetStore.jobSheetDetail?.spareParts || []
+  return parts.reduce(
+    (sum: number, sp: any) => sum + (Number(sp.price) || 0) * (Number(sp.quantity) || 0),
+    0,
+  )
+})
 
-//   const { isEmpty, data } = signaturePad.value.saveSignature()
-//   if (isEmpty) {
-//     Swal.fire('Empty Signature', 'Please sign before saving', 'warning')
-//     return
-//   }
+// ---- add spare part ----
+const handleAddSparePart = (payload: any) => {
+  if (!jobSheetStore.jobSheetDetail) return
 
-//   const blob = await (await fetch(data)).blob()
-//   const file = new File([blob], 'customer-signature.png', {
-//     type: 'image/png',
-//   })
+  if (!jobSheetStore.jobSheetDetail.spareParts) jobSheetStore.jobSheetDetail.spareParts = []
 
-//   await jobSheetStore.uploadAttachment(file, jobSheetStore.jobSheetDetail.id)
-// }
+  jobSheetStore.jobSheetDetail.spareParts.push({
+    itemName: payload.itemName,
+    quantity: payload.quantity,
+    price: payload.price,
+  })
 
+  addSparePartOpen.value = false
+}
+
+// ---- delete spare part (local only) ----
+const removeSparePart = (index: number) => {
+  if (!jobSheetStore.jobSheetDetail?.spareParts) return
+  jobSheetStore.jobSheetDetail.spareParts.splice(index, 1)
+}
+
+// ---- add laser data ----
+const handleAddLaserData = (payload: any) => {
+  if (!jobSheetStore.jobSheetDetail) return
+  if (!jobSheetStore.jobSheetDetail.laserData) jobSheetStore.jobSheetDetail.laserData = []
+
+  jobSheetStore.jobSheetDetail.laserData.push({
+    laserType: payload.laserType,
+    lampCounter: payload.lampCounter,
+    voltage: payload.voltage,
+  })
+
+  addLaserDataOpen.value = false
+}
+
+const removeLaserData = (index: number) => {
+  if (!jobSheetStore.jobSheetDetail?.laserData) return
+  jobSheetStore.jobSheetDetail.laserData.splice(index, 1)
+}
+
+// ---- SAVE ----
 const handleEdit = () => {
   if (!route.params.id) {
     Swal.fire('Error', 'No sheet ID provided', 'error')
     return
   }
+
   const payload = {
     checkInTime: jobSheetStore.jobSheetDetail?.checkInTime,
     arrivalTime: jobSheetStore.jobSheetDetail?.arrivalTime,
@@ -102,17 +194,28 @@ const handleEdit = () => {
     total: jobSheetStore.jobSheetDetail?.total,
     totalAfterDisc: jobSheetStore.jobSheetDetail?.totalAfterDisc,
     customerSignature: jobSheetStore.jobSheetDetail?.customerSignature,
-    spareParts: [],
-    laserData: [],
+
+    spareParts:
+      jobSheetStore.jobSheetDetail?.spareParts?.map((sp) => ({
+        itemName: sp.itemName,
+        quantity: sp.quantity,
+        price: sp.price,
+      })) || [],
+
+    laserData:
+      jobSheetStore.jobSheetDetail?.laserData?.map((ld) => ({
+        laserType: ld.laserType,
+        lampCounter: ld.lampCounter,
+        voltage: ld.voltage,
+      })) || [],
   }
 
+  const routeId = route.params.id
+  if (!routeId) return
+
   loading.value = true
-  jobSheetStore.updateJobSheet(route.params.id.toString(), { ...payload }).then(() => {
-    if (!route.params.id) {
-      Swal.fire('Error', 'No sheet ID provided', 'error')
-      return
-    }
-    jobSheetStore.fetchJobSheet(route.params.id.toString()).finally(() => {
+  jobSheetStore.updateJobSheet(routeId.toString(), { ...payload }).then(() => {
+    jobSheetStore.fetchJobSheet(routeId.toString()).finally(() => {
       loading.value = false
       changed.value = false
     })
@@ -200,12 +303,65 @@ const handleEdit = () => {
           {{ jobSheetStore.jobSheetDetail.customer.phone }}
         </p>
       </div>
-      <!-- Time Data  -->
-      <!-- <div class="card h-auto space-y-2 md:col-span-2">
+      <!-- Time Data -->
+      <div class="card h-auto space-y-3 md:col-span-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Time Data:</span>
         </h2>
-      </div> -->
+
+        <div class="grid md:grid-cols-3 w-full gap-4">
+          <!-- Check In -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium">Check In Time</label>
+            <VueDatePicker
+              v-model="jobSheetStore.jobSheetDetail.checkInTime"
+              :enable-time-picker="true"
+              :teleport="true"
+              :clearable="true"
+            />
+          </div>
+
+          <!-- Arrival -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium">Arrival Time</label>
+            <VueDatePicker
+              v-model="jobSheetStore.jobSheetDetail.arrivalTime"
+              :enable-time-picker="true"
+              :teleport="true"
+              :clearable="true"
+            />
+          </div>
+
+          <!-- Completion -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium">Completion Time</label>
+            <VueDatePicker
+              v-model="jobSheetStore.jobSheetDetail.completionTime"
+              :enable-time-picker="true"
+              :teleport="true"
+              :clearable="true"
+            />
+          </div>
+        </div>
+
+        <!-- Labour -->
+        <div class="flex flex-col md:flex-row w-full gap-3 md:items-end">
+          <div class="flex-1">
+            <label class="block text-sm font-medium">Labour Time (minutes)</label>
+            <input
+              type="number"
+              class="chef-text-input w-full"
+              v-model.number="jobSheetStore.jobSheetDetail.labourTimeMin"
+              disabled
+            />
+          </div>
+
+          <p class="text-sm text-teritiary md:w-64">
+            Labour time is automatically calculated from Arrival → Completion.
+          </p>
+        </div>
+      </div>
+
       <!-- Machine  -->
       <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
@@ -272,7 +428,7 @@ const handleEdit = () => {
       </div>
 
       <!-- Attachments -->
-      <div class="card h-auto space-y-3 items-center md:items-start">
+      <div class="card h-auto space-y-3 items-center md:items-start md:row-span-2">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Attachments:</span>
         </h2>
@@ -312,21 +468,104 @@ const handleEdit = () => {
 
         <p v-else class="text-sm text-teritiary">No attachments uploaded</p>
       </div>
+      <!-- Spare Parts -->
+      <div class="card h-auto space-y-3 items-center md:items-start md:row-span-2">
+        <div class="flex items-center justify-between w-full gap-3">
+          <h2 class="text-primary text-sm md:text-lg">
+            <span class="font-black text-sm md:text-base">Spare Parts:</span>
+          </h2>
 
-      <!-- Signature  -->
-      <!-- <div class="card h-auto space-y-2 items-center md:items-start">
-        <h2 class="text-primary text-sm md:text-lg">
-          <span class="font-black text-sm md:text-base">Signature:</span>
-          <div class="space-y-3">
-            <VueSignaturePad ref="signaturePad" class="border rounded-lg h-40 w-full" />
+          <button class="btn-sm-outline w-32" @click="addSparePartOpen = true">Add</button>
+        </div>
 
-            <div class="flex gap-2">
-              <button class="btn-lg-outline" @click="clearSignature">Clear</button>
-              <button class="btn-lg" @click="saveSignature">Save Signature</button>
+        <p class="text-sm text-teritiary w-full">
+          Total: <span class="font-bold">{{ sparePartsTotal.toFixed(2) }}</span>
+        </p>
+
+        <div v-if="jobSheetStore.jobSheetDetail.spareParts?.length" class="space-y-2 w-full">
+          <div
+            v-for="(sp, idx) in jobSheetStore.jobSheetDetail.spareParts"
+            :key="sp.id || idx"
+            class="flex items-center justify-between border rounded p-2 gap-3 w-full"
+          >
+            <div class="flex flex-col">
+              <p class="font-bold">{{ sp.itemName }}</p>
+              <p class="text-sm text-teritiary">Qty: {{ sp.quantity }} | Price: {{ sp.price }}</p>
             </div>
+
+            <button class="btn-sm-outline w-24" @click="removeSparePart(idx)">Remove</button>
           </div>
+        </div>
+
+        <p v-else class="text-sm text-teritiary">No spare parts added</p>
+      </div>
+
+      <!-- Laser Data -->
+      <div class="card h-auto space-y-3 items-center md:items-start md:col-span-2">
+        <div class="flex items-center justify-between w-full gap-3">
+          <h2 class="text-primary text-sm md:text-lg">
+            <span class="font-black text-sm md:text-base">Laser Data:</span>
+          </h2>
+
+          <button class="btn-sm-outline w-32" @click="addLaserDataOpen = true">Add</button>
+        </div>
+
+        <div v-if="jobSheetStore.jobSheetDetail.laserData?.length" class="space-y-2 w-full">
+          <div
+            v-for="(ld, idx) in jobSheetStore.jobSheetDetail.laserData"
+            :key="ld.id || idx"
+            class="flex items-center justify-between border rounded p-2 gap-3 w-full"
+          >
+            <div class="flex flex-col">
+              <p class="font-bold">{{ ld.laserType }}</p>
+              <p class="text-sm text-teritiary">
+                Lamp: {{ ld.lampCounter ?? '-' }} | Voltage: {{ ld.voltage ?? '-' }}
+              </p>
+            </div>
+
+            <button class="btn-sm-outline w-24" @click="removeLaserData(idx)">Remove</button>
+          </div>
+        </div>
+
+        <p v-else class="text-sm text-teritiary">No laser data added</p>
+      </div>
+
+      <!-- Signature -->
+      <div class="card space-y-3 items-center md:items-start md:col-span-2">
+        <h2 class="text-primary text-sm md:text-lg">
+          <span class="font-black text-sm md:text-base">Customer Signature:</span>
         </h2>
-      </div> -->
+
+        <div class="w-full space-y-3">
+          <!-- wrapper forces stable height -->
+          <div class="w-full h-40">
+            <Vue3Signature
+              ref="signaturePad"
+              class="border rounded-lg w-full h-full bg-white overflow-hidden"
+              :sigOption="{
+                penColor: 'black',
+                backgroundColor: 'white',
+              }"
+              style="height: 100%; width: 100%"
+            />
+          </div>
+
+          <div class="flex flex-col md:flex-row gap-2 w-full">
+            <button class="btn-lg-outline flex-1" @click="clearSignature">Clear</button>
+            <button class="btn-lg flex-1" @click="saveSignature">Save Signature</button>
+          </div>
+
+          <!-- Preview -->
+          <div v-if="jobSheetStore.jobSheetDetail?.customerSignature" class="space-y-2 w-full">
+            <p class="text-sm text-teritiary">Saved Signature Preview:</p>
+            <img
+              :src="jobSheetStore.jobSheetDetail.customerSignature"
+              class="border rounded-lg max-h-40"
+            />
+          </div>
+        </div>
+      </div>
+
       <!-- Updates  -->
       <div v-if="changed" class="card h-auto flex-row md:col-span-2 gap-3">
         <button @click="handleReset" class="btn-lg-outline flex-1">Reset Changes</button>
@@ -338,5 +577,19 @@ const handleEdit = () => {
         Back to Home
       </router-link>
     </div>
+    <!-- Modals -->
+    <AddSparePartModal
+      :visible="addSparePartOpen"
+      :loading="false"
+      @close="addSparePartOpen = false"
+      @submit="handleAddSparePart"
+    />
+
+    <AddLaserDataModal
+      :visible="addLaserDataOpen"
+      :loading="false"
+      @close="addLaserDataOpen = false"
+      @submit="handleAddLaserData"
+    />
   </section>
 </template>

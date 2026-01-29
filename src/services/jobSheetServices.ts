@@ -34,13 +34,15 @@ export interface Attachment {
   key?: string
 }
 type Filters = {
-  customerId?: string
+  customerName?: string
   serialNumber?: string
 }
 
 class JobSheetServices {
   async fetchJobSheets(filters: Filters = {}, page: number, pageSize: number) {
-    const res = await instance.get('/job-sheets', { params: { filters, pageSize, page } })
+    const res = await instance.get('/job-sheets', {
+      params: { customerName: filters.customerName, pageSize, page },
+    })
     return res.data
   }
 

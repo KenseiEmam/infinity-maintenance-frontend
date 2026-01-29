@@ -10,11 +10,11 @@ const loading = ref(true)
 // Filters
 type Filter = {
   serialNumber?: string
-  customerId?: string
+  customerName?: string
 }
 const filter = ref(<Filter>{
   serialNumber: '',
-  customerId: '',
+  customerName: '',
 })
 
 // Pagination
@@ -24,30 +24,42 @@ const addingjobSheet = ref(false)
 const modalLoad = ref(false)
 const totalPages = computed(() => Math.ceil(jobSheetStore.totalCount / pageSize.value))
 
-// // Change filter
-// function changeFilter($event: any) {
-//   filter.value.serialNumber = $event.target.value
-//   page.value = 1
-// }
+// ---- Debounce helper ----
+function debounce<T extends (...args: any[]) => void>(fn: T, delay = 500) {
+  let timeout: ReturnType<typeof setTimeout> | null = null
 
-// Fetch jobSheets whenever filter or page changes
-watch(
-  [filter, page],
-  () => {
-    loading.value = true
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => fn(...args), delay)
+  }
+}
 
-    jobSheetStore.fetchJobSheets(filter.value, page.value, pageSize.value).finally(() => {
-      loading.value = false
-    })
-  },
-  { deep: true },
-)
-
-onMounted(() => {
+const fetchJobSheets = () => {
   loading.value = true
   jobSheetStore.fetchJobSheets(filter.value, page.value, pageSize.value).finally(() => {
     loading.value = false
   })
+}
+
+const debouncedFetchJobSheets = debounce(fetchJobSheets, 500)
+
+// Fetch jobSheets whenever filter changes (debounced)
+watch(
+  filter,
+  () => {
+    page.value = 1
+    debouncedFetchJobSheets()
+  },
+  { deep: true },
+)
+
+// Fetch jobSheets whenever page changes (instant)
+watch(page, () => {
+  fetchJobSheets()
+})
+
+onMounted(() => {
+  fetchJobSheets()
 })
 
 const handleAdd = (event: any) => {
@@ -56,9 +68,7 @@ const handleAdd = (event: any) => {
   jobSheetStore.createJobSheet(event).then(() => {
     addingjobSheet.value = false
     modalLoad.value = false
-    jobSheetStore.fetchJobSheets(filter.value, page.value, pageSize.value).finally(() => {
-      loading.value = false
-    })
+    fetchJobSheets()
   })
 }
 
@@ -80,19 +90,20 @@ function prevPage() {
           Here you will see all your Job Sheets and be able to filter them!
         </p>
       </div>
-      <!--
-      <select
-        @change="changeFilter"
-        customerId="filter"
-        id="filter1"
-        class="md:ml-auto chef-text-input w-full md:w-auto"
-      >
-        <option :value="[]">No Filter</option>
-        <option :value="['ENGINEER']">Engineers</option>
-        <option :value="['ADMIN']">Admins</option>
-      </select> -->
+      <div class="md:ml-auto md:flex items-center gap-3">
+        <label for="search" class="text-sm text-secondary min-w-max text-center md:text-left"
+          >Search by Customer:</label
+        >
+        <input
+          type="text"
+          id="search"
+          class="chef-text-input rounded-full px-3 py-2"
+          v-model="filter.customerName"
+          placeholder="Type customer name here..."
+        />
+      </div>
 
-      <p v-if="jobSheetStore.jobSheets" class="md:ml-auto subheader-small">
+      <p v-if="jobSheetStore.jobSheets" class="subheader-small">
         Showing {{ jobSheetStore.jobSheets?.length }} Job Sheet(s)
       </p>
       <button class="btn-sm-outline w-full md:w-auto" @click="addingjobSheet = true">
