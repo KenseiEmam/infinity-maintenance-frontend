@@ -92,7 +92,9 @@ function prevPage() {
       <p v-if="userStore.customers" class="ml-auto subheader-small">
         Showing {{ userStore.customers?.length }} Customer(s)
       </p>
-      <button class="btn-sm-outline" @click="addingCustomer = true">Create Customer</button>
+      <button class="btn-sm-outline w-full md:w-auto" @click="addingCustomer = true">
+        Create Customer
+      </button>
     </div>
 
     <!-- Loading State -->

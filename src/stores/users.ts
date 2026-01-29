@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import Swal from 'sweetalert2'
 import userServices from '@/services/userServices'
+import router from '@/router'
 
 function showError(message: string) {
   Swal.fire({
@@ -62,6 +63,7 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem('role', data.role)
       return data
     } catch (err: any) {
+      logout()
       showError(getErrorMessage(err.response.data.error, 'Failed to fetch user'))
     }
   }
@@ -77,6 +79,7 @@ export const useUserStore = defineStore('user', () => {
       return data.user
     } catch (err: any) {
       console.log(err?.response?.data.error)
+      logout()
       showError(getErrorMessage(err, 'Failed to Login'))
       throw err
     }
@@ -88,6 +91,7 @@ export const useUserStore = defineStore('user', () => {
 
     localStorage.removeItem('token')
     localStorage.removeItem('UserID')
+    router.push({ name: 'Login' })
   }
 
   /* ================= USERS ================= */

@@ -24,11 +24,11 @@ const addingjobSheet = ref(false)
 const modalLoad = ref(false)
 const totalPages = computed(() => Math.ceil(jobSheetStore.totalCount / pageSize.value))
 
-// Change filter
-function changeFilter($event: any) {
-  filter.value.serialNumber = $event.target.value
-  page.value = 1
-}
+// // Change filter
+// function changeFilter($event: any) {
+//   filter.value.serialNumber = $event.target.value
+//   page.value = 1
+// }
 
 // Fetch jobSheets whenever filter or page changes
 watch(
@@ -80,7 +80,7 @@ function prevPage() {
           Here you will see all your Job Sheets and be able to filter them!
         </p>
       </div>
-
+      <!--
       <select
         @change="changeFilter"
         customerId="filter"
@@ -90,12 +90,14 @@ function prevPage() {
         <option :value="[]">No Filter</option>
         <option :value="['ENGINEER']">Engineers</option>
         <option :value="['ADMIN']">Admins</option>
-      </select>
+      </select> -->
 
       <p v-if="jobSheetStore.jobSheets" class="subheader-small">
         Showing {{ jobSheetStore.jobSheets?.length }} jobSheet(s)
       </p>
-      <button class="btn-sm-outline" @click="addingjobSheet = true">Add Job Sheet</button>
+      <button class="btn-sm-outline w-full md:w-auto" @click="addingjobSheet = true">
+        Add Job Sheet
+      </button>
     </div>
 
     <!-- Loading State -->
@@ -117,10 +119,10 @@ function prevPage() {
         :key="jobSheet.id"
       >
         <div>
-          <p class="font-black">Job for: {{ jobSheet.customer.name }}</p>
-          <p class="text-teritiary text-sm">By: {{ jobSheet.engineer.name }}</p>
+          <p class="font-black">Customer: {{ jobSheet.customer.name }}</p>
+          <p class="text-teritiary text-sm">Engineer: {{ jobSheet.engineer.name }}</p>
         </div>
-        <div v-if="jobSheet.createdAt">
+        <div class="w-full space-y-3" v-if="jobSheet.createdAt">
           <p class="text-teritiary text-sm">
             Created
             {{
@@ -132,7 +134,7 @@ function prevPage() {
             }}
           </p>
           <button
-            class="btn-sm-outline"
+            class="btn-sm-outline md:w-auto w-full"
             @click="$router.push({ name: 'single-sheet', params: { id: jobSheet.id } })"
           >
             View Sheet

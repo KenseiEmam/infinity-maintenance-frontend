@@ -148,21 +148,21 @@ function prevPage() {
       </p>
       <button
         v-if="filter.type === 'Machines'"
-        class="btn-sm-outline"
+        class="btn-sm-outline md:w-auto w-full"
         @click="addingMachine = true"
       >
         Create Machine
       </button>
       <button
         v-else-if="filter.type === 'Models'"
-        class="btn-sm-outline"
+        class="btn-sm-outline md:w-auto w-full"
         @click="addingModel = true"
       >
         Create Model
       </button>
       <button
         v-else-if="filter.type === 'Manufacturers'"
-        class="btn-sm-outline"
+        class="btn-sm-outline md:w-auto w-full"
         @click="addingManufacturer = true"
       >
         Create Manufacturer
@@ -195,8 +195,10 @@ function prevPage() {
             {{ machine.customer.name || 'Missing Address' }}
           </p>
         </div>
-        <div class="flex gap-2 ml-auto">
-          <button class="btn-lg-outline" @click="editMachine = machine">Edit</button>
+        <div class="flex gap-2 w-full md:w-auto md:ml-auto">
+          <button class="btn-lg-outline w-full md:w-auto" @click="editMachine = machine">
+            Edit
+          </button>
         </div>
       </div>
 

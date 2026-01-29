@@ -90,10 +90,12 @@ function prevPage() {
         </p>
       </div>
 
-      <p v-if="callStore.calls" class="subheader-small ml-auto">
+      <p v-if="callStore.calls" class="subheader-small md:ml-auto">
         Showing {{ callStore.calls?.length }} call(s)
       </p>
-      <button class="btn-sm-outline" @click="addingcall = true">Add Job Call</button>
+      <button class="btn-sm-outline w-full md:w-auto" @click="addingcall = true">
+        Add Job Call
+      </button>
     </div>
 
     <!-- Loading State -->
@@ -135,7 +137,7 @@ function prevPage() {
           </p>
           <button v-else class="btn-sm" @click="showAssignModal = call.id">Assign Call</button>
           <button
-            class="btn-sm-outline"
+            class="btn-sm-outline md:w-auto w-full"
             @click="$router.push({ name: 'single-call', params: { id: call.id } })"
           >
             View Call

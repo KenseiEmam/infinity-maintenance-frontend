@@ -254,7 +254,13 @@ const handleEdit = () => {
         </h2>
 
         <!-- Upload -->
-        <input type="file" class="chef-text-input" @change="uploadFile" :disabled="uploading" />
+        <input
+          type="file"
+          accept="image/*"
+          class="chef-text-input"
+          @change="uploadFile"
+          :disabled="uploading"
+        />
 
         <p v-if="uploading" class="text-sm animate-pulse">Uploading...</p>
 

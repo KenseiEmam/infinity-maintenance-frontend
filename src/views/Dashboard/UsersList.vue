@@ -107,7 +107,9 @@ function prevPage() {
       <p v-if="userStore.users" class="subheader-small">
         Showing {{ userStore.users?.length }} User(s)
       </p>
-      <button class="btn-sm-outline" @click="addingUser = true">Invite User</button>
+      <button class="btn-sm-outline w-full md:w-auto" @click="addingUser = true">
+        Invite User
+      </button>
     </div>
 
     <!-- Loading State -->
