@@ -50,18 +50,18 @@ const router = createRouter({
         {
           name: 'visits',
           path: 'visits',
-          meta: { requiresAdmin: true },
+          meta: { requiresAuth: true },
           component: ScheduleVisits,
         },
         {
           name: 'customers',
           path: 'customers',
-          meta: { requiresAdmin: true },
+          meta: { requiresAuth: true },
           component: CustomerList,
         },
         {
           path: 'sheets',
-          meta: { requiresAdmin: true },
+          meta: { requiresAuth: true },
           children: [
             {
               path: '',
@@ -77,7 +77,7 @@ const router = createRouter({
         },
         {
           path: 'calls',
-          meta: { requiresAdmin: true },
+          meta: { requiresAuth: true },
           children: [
             {
               path: '',

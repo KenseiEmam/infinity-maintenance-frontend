@@ -17,9 +17,7 @@ const userStore = useUserStore()
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const fieldType = computed(() => (showPassword.value ? 'text' : 'password'))
-const confirmFieldType = computed(() =>
-  showConfirmPassword.value ? 'text' : 'password'
-)
+const confirmFieldType = computed(() => (showConfirmPassword.value ? 'text' : 'password'))
 function togglePassword() {
   showPassword.value = !showPassword.value
 }
@@ -73,7 +71,7 @@ async function signUpNewUser() {
     showPassword.value = false
     showConfirmPassword.value = false
 
-    router.push({ name: 'login' })
+    router.push({ name: 'Login' })
   } catch (error: any) {
     Swal.fire('Error', error?.message || 'Signup failed', 'error')
   } finally {

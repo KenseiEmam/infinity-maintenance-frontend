@@ -37,6 +37,7 @@ export interface JobSheet {
   labourTimeMin?: number
   machineId?: string
   engineerId?: string
+  callId?: string
   createdAt?: string
   updatedAt?: string
   problemFound?: string
@@ -46,6 +47,7 @@ export interface JobSheet {
   customer?: any
   machine?: any
   engineer?: any
+  call?: any
   spareParts?: any[]
   laserData?: any[]
   attachments?: any[]

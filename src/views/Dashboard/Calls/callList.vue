@@ -1,11 +1,15 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import AddcallModal from '@/components/Modals/AddCallModal.vue'
+
 import AssignEngineerModal from '@/components/Modals/AssignEngineerModal.vue'
+import CallJobSheetModal from '@/components/Modals/CallJobSheetModal.vue'
 import { useCallStore } from '@/stores/callStore'
+import { useJobSheetStore } from '@/stores/jobSheetStore'
 import { onMounted, ref, watch, computed } from 'vue'
 
 const callStore = useCallStore()
+const jobSheetStore = useJobSheetStore()
 const loading = ref(true)
 
 // Filters
@@ -22,10 +26,12 @@ const filter = ref(<Filter>{
 const page = ref(1)
 const pageSize = ref(10)
 const addingcall = ref(false)
+const chosenCall = ref<any | undefined>(undefined)
 const showAssignModal = ref<string | undefined>(undefined)
 
 const modalLoad = ref(false)
 const modalLoad2 = ref(false)
+const modalLoad3 = ref(false)
 const totalPages = computed(() => Math.ceil(callStore.totalCount / pageSize.value))
 
 // Fetch calls whenever filter or page changes
@@ -47,6 +53,67 @@ onMounted(() => {
     loading.value = false
   })
 })
+
+const handleAddJob = (event: any) => {
+  loading.value = true
+  modalLoad3.value = true
+
+  if (!chosenCall.value?.callTime) {
+    alert('Date is required')
+    modalLoad3.value = false
+    loading.value = false
+    return
+  }
+
+  if (!chosenCall.value?.customerId) {
+    alert('Customer is required')
+    modalLoad3.value = false
+    loading.value = false
+    return
+  }
+
+  if (!chosenCall.value?.machineId) {
+    alert('Machine is required')
+    modalLoad3.value = false
+    loading.value = false
+    return
+  }
+
+  const engineerId = chosenCall.value?.assignedToId || event.engineerId
+  if (!engineerId) {
+    alert('Engineer is required')
+    modalLoad3.value = false
+    loading.value = false
+    return
+  }
+
+  const payload = {
+    callId: chosenCall.value.id,
+    purchaseOrderNo: event.purchaseOrderNo,
+    date: new Date(chosenCall.value.callTime).toISOString(),
+    customerId: chosenCall.value.customerId,
+    machineId: chosenCall.value.machineId,
+    engineerId,
+    problemFound: event.problemFound,
+    workReport: event.workReport,
+    total: event.total,
+    totalAfterDisc: event.totalAfterDisc,
+  }
+
+  jobSheetStore
+    .createJobSheet(payload)
+    .then(() => {
+      chosenCall.value = undefined
+      modalLoad3.value = false
+      callStore.fetchCalls(page.value, pageSize.value).finally(() => {
+        loading.value = false
+      })
+    })
+    .catch(() => {
+      modalLoad3.value = false
+      loading.value = false
+    })
+}
 
 const handleAdd = (event: any) => {
   loading.value = true
@@ -122,19 +189,31 @@ function prevPage() {
           <p class="text-teritiary line-clamp-2 text-xs">{{ call.description }}</p>
         </div>
         <div class="flex flex-col gap-2 w-full md:w-auto">
-          <p v-if="call.assignedAt" class="text-teritiary text-sm">
-            Assigned
-            {{
-              new Date(call.assignedAt).toLocaleDateString('en', {
-                day: '2-digit',
-                month: 'short',
-                year: '2-digit',
-              })
-            }}
-          </p>
-          <p v-if="call.assignedTo" class="text-teritiary text-sm">
-            Assigned to: {{ call.assignedTo?.name }}
-          </p>
+          <div v-if="call.assignedTo">
+            <p v-if="call.assignedAt" class="text-teritiary text-sm">
+              Assigned
+              {{
+                new Date(call.assignedAt).toLocaleDateString('en', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: '2-digit',
+                })
+              }}
+            </p>
+            <p class="text-teritiary text-sm">Assigned to: {{ call.assignedTo?.name }}</p>
+
+            <button v-if="!call.jobSheet" class="btn-sm w-full" @click="chosenCall = call">
+              Create Job
+            </button>
+            <button
+              v-else
+              class="btn-sm w-full"
+              @click="$router.push({ name: 'single-sheet', params: { id: call.jobSheet.id } })"
+            >
+              Visit Job
+            </button>
+          </div>
+
           <button v-else class="btn-sm" @click="showAssignModal = call.id">Assign Call</button>
           <button
             class="btn-sm-outline md:w-auto w-full"
@@ -177,6 +256,12 @@ function prevPage() {
       :loading="modalLoad2"
       @close="showAssignModal = undefined"
       @submit="assignEngineer"
+    />
+    <CallJobSheetModal
+      @submit="handleAddJob"
+      @close="chosenCall = undefined"
+      :visible="chosenCall"
+      :loading="modalLoad3"
     />
   </section>
 </template>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import instance from './axiosClient'
 
 export interface Call {
@@ -8,8 +9,9 @@ export interface Call {
   assignedToId?: string
   assignedAt?: string
   callTime?: string
-  customer?: { id: string; name: string }
-  machine?: { id: string; serialNumber: string }
+  jobSheet?: any
+  customer?: { id: string; name: string; phone: string; address: string }
+  machine?: { id: string; serialNumber: string; underWarranty: boolean }
   assignedTo?: { id: string; name: string; email: string }
 }
 

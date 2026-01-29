@@ -74,6 +74,15 @@ watch(
             })
           }}
         </h3>
+        <button
+          v-if="callStore.callDetail.jobSheet"
+          class="btn-lg w-full"
+          @click="
+            $router.push({ name: 'single-sheet', params: { id: callStore.callDetail.jobSheet.id } })
+          "
+        >
+          Visit Related Job
+        </button>
       </div>
       <!-- Supervising Engineer -->
       <div class="card h-auto space-y-2 items-center md:items-start">

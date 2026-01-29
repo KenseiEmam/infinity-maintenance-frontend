@@ -164,6 +164,18 @@ const handleEdit = () => {
             })
           }}
         </h3>
+        <button
+          v-if="jobSheetStore.jobSheetDetail.callId"
+          class="btn-lg w-full"
+          @click="
+            $router.push({
+              name: 'single-call',
+              params: { id: jobSheetStore.jobSheetDetail.callId },
+            })
+          "
+        >
+          Visit Related Call
+        </button>
       </div>
       <!-- Supervising Engineer -->
       <div class="card h-auto space-y-2 items-center md:items-start">

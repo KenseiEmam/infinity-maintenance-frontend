@@ -11,15 +11,17 @@ export interface JobSheet {
   labourTimeMin?: number
   machineId?: string
   engineerId?: string
+  callId?: string
   createdAt?: string
   updatedAt?: string
   problemFound?: string
   workReport?: string
+  total?: number
+  totalAfterDisc?: number
   customer?: any
   machine?: any
   engineer?: any
-  total?: number
-  totalAfterDisc?: number
+  call?: any
   spareParts?: any[]
   laserData?: any[]
   attachments?: any[]

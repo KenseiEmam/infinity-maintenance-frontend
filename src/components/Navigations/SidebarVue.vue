@@ -76,11 +76,7 @@
           </svg>
           <p>Calls</p>
         </RouterLink>
-        <RouterLink
-          :to="{ name: 'customers' }"
-          v-if="userStore.loggedInUser?.role === 'ADMIN'"
-          class="flex gap-4 items-center hover:opacity-60"
-        >
+        <RouterLink :to="{ name: 'customers' }" class="flex gap-4 items-center hover:opacity-60">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 512 512"
@@ -93,11 +89,7 @@
           </svg>
           <p>Customers</p>
         </RouterLink>
-        <RouterLink
-          :to="{ name: 'visits' }"
-          v-if="userStore.loggedInUser?.role === 'ADMIN'"
-          class="flex gap-4 items-center hover:opacity-60"
-        >
+        <RouterLink :to="{ name: 'visits' }" class="flex gap-4 items-center hover:opacity-60">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 448 512"
@@ -193,7 +185,6 @@
             >
             <RouterLink
               :to="{ name: 'users' }"
-              v-if="userStore.loggedInUser?.role === 'ADMIN'"
               class="text-base block py-2 btn-lg-outline text-center"
               >Users</RouterLink
             >

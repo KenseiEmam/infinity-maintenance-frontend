@@ -35,6 +35,7 @@ export interface Call {
   assignedToId?: string
   assignedAt?: string
   callTime?: string
+  jobSheet?: any
   customer?: { id: string; name: string; phone: string; address: string }
   machine?: { id: string; serialNumber: string; underWarranty: boolean }
   assignedTo?: { id: string; name: string; email: string }
