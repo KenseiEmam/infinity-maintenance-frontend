@@ -61,7 +61,7 @@
             />
           </svg>
 
-          <p>Jobsheets</p>
+          <p>Job Sheets</p>
         </RouterLink>
         <RouterLink :to="{ name: 'calls' }" class="flex gap-4 items-center hover:opacity-60">
           <svg

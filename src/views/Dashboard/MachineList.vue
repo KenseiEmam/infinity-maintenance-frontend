@@ -143,30 +143,39 @@ function prevPage() {
         <option value="Models">Models</option>
         <option value="Manufacturers">Manufacturers</option>
       </select>
-      <p v-if="machineStore.machines" class="subheader-small">
-        Showing {{ machineStore.machines?.length }} Machine(s)
-      </p>
-      <button
+      <div
         v-if="filter.type === 'Machines'"
-        class="btn-sm-outline md:w-auto w-full"
-        @click="addingMachine = true"
+        class="md:flex-row flex-col flex items-center gap-3 w-full md:w-auto"
       >
-        Create Machine
-      </button>
-      <button
+        <p v-if="machineStore.machines" class="subheader-small">
+          Showing {{ machineStore.machines?.length }} Machine(s)
+        </p>
+        <button class="btn-sm-outline md:w-auto w-full" @click="addingMachine = true">
+          Create Machine
+        </button>
+      </div>
+      <div
         v-else-if="filter.type === 'Models'"
-        class="btn-sm-outline md:w-auto w-full"
-        @click="addingModel = true"
+        class="md:flex-row flex-col flex items-center gap-3 w-full md:w-auto"
       >
-        Create Model
-      </button>
-      <button
+        <p v-if="machineStore.models" class="subheader-small">
+          Showing {{ machineStore.models?.length }} Model(s)
+        </p>
+        <button class="btn-sm-outline md:w-auto w-full" @click="addingModel = true">
+          Create Model
+        </button>
+      </div>
+      <div
         v-else-if="filter.type === 'Manufacturers'"
-        class="btn-sm-outline md:w-auto w-full"
-        @click="addingManufacturer = true"
+        class="md:flex-row flex-col flex items-center gap-3 w-full md:w-auto"
       >
-        Create Manufacturer
-      </button>
+        <p v-if="machineStore.manufacturers" class="subheader-small">
+          Showing {{ machineStore.manufacturers?.length }} Manufacturer(s)
+        </p>
+        <button class="btn-sm-outline md:w-auto w-full" @click="addingManufacturer = true">
+          Create Manufacturer
+        </button>
+      </div>
     </div>
 
     <!-- Loading State -->

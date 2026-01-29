@@ -92,8 +92,8 @@ function prevPage() {
         <option :value="['ADMIN']">Admins</option>
       </select> -->
 
-      <p v-if="jobSheetStore.jobSheets" class="subheader-small">
-        Showing {{ jobSheetStore.jobSheets?.length }} jobSheet(s)
+      <p v-if="jobSheetStore.jobSheets" class="md:ml-auto subheader-small">
+        Showing {{ jobSheetStore.jobSheets?.length }} Job Sheet(s)
       </p>
       <button class="btn-sm-outline w-full md:w-auto" @click="addingjobSheet = true">
         Add Job Sheet
@@ -122,7 +122,7 @@ function prevPage() {
           <p class="font-black">Customer: {{ jobSheet.customer.name }}</p>
           <p class="text-teritiary text-sm">Engineer: {{ jobSheet.engineer.name }}</p>
         </div>
-        <div class="w-full space-y-3" v-if="jobSheet.createdAt">
+        <div class="w-full md:w-auto space-y-3" v-if="jobSheet.createdAt">
           <p class="text-teritiary text-sm">
             Created
             {{

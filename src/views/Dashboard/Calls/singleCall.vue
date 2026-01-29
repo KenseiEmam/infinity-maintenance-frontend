@@ -49,7 +49,7 @@ watch(
     <!-- calls List -->
     <div v-else-if="callStore.callDetail" class="flex flex-col gap-3 grid gap3">
       <!-- Sheet ID -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="header-small text-left">
           <span class="font-black text-sm md:text-base">Sheet ID:</span
           >{{ callStore.callDetail.id }}
@@ -76,7 +76,7 @@ watch(
         </h3>
       </div>
       <!-- Supervising Engineer -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Supervised by:</span>
         </h2>
@@ -86,7 +86,7 @@ watch(
         <p>{{ callStore.callDetail.assignedTo?.email }}</p>
       </div>
       <!-- Customer  -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">For Customer:</span>
         </h2>
@@ -100,7 +100,7 @@ watch(
       </div>
 
       <!-- Machine  -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Machine:</span>
         </h2>
@@ -112,7 +112,7 @@ watch(
         </p>
       </div>
       <!-- Description  -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Description:</span>
         </h2>

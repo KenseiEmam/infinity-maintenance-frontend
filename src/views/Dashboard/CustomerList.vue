@@ -89,7 +89,7 @@ function prevPage() {
         </p>
       </div>
 
-      <p v-if="userStore.customers" class="ml-auto subheader-small">
+      <p v-if="userStore.customers" class="md:ml-auto subheader-small">
         Showing {{ userStore.customers?.length }} Customer(s)
       </p>
       <button class="btn-sm-outline w-full md:w-auto" @click="addingCustomer = true">
@@ -126,8 +126,8 @@ function prevPage() {
             {{ user.phone || 'Missing Phone' }}
           </p>
         </div>
-        <div class="flex gap-2 ml-auto">
-          <button class="btn-lg-outline" @click="editCustomer = user">Edit</button>
+        <div class="flex w-full md:w-auto gap-2 ml-auto">
+          <button class="btn-lg-outline w-full md:w-auto" @click="editCustomer = user">Edit</button>
         </div>
       </div>
 

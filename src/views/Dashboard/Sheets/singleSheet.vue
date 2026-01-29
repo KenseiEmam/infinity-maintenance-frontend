@@ -92,19 +92,31 @@ const handleEdit = () => {
     Swal.fire('Error', 'No sheet ID provided', 'error')
     return
   }
+  const payload = {
+    checkInTime: jobSheetStore.jobSheetDetail?.checkInTime,
+    arrivalTime: jobSheetStore.jobSheetDetail?.arrivalTime,
+    completionTime: jobSheetStore.jobSheetDetail?.completionTime,
+    labourTimeMin: jobSheetStore.jobSheetDetail?.labourTimeMin,
+    problemFound: jobSheetStore.jobSheetDetail?.problemFound,
+    workReport: jobSheetStore.jobSheetDetail?.workReport,
+    total: jobSheetStore.jobSheetDetail?.total,
+    totalAfterDisc: jobSheetStore.jobSheetDetail?.totalAfterDisc,
+    customerSignature: jobSheetStore.jobSheetDetail?.customerSignature,
+    spareParts: [],
+    laserData: [],
+  }
+
   loading.value = true
-  jobSheetStore
-    .updateJobSheet(route.params.id.toString(), { ...jobSheetStore.jobSheetDetail })
-    .then(() => {
-      if (!route.params.id) {
-        Swal.fire('Error', 'No sheet ID provided', 'error')
-        return
-      }
-      jobSheetStore.fetchJobSheet(route.params.id.toString()).finally(() => {
-        loading.value = false
-        changed.value = false
-      })
+  jobSheetStore.updateJobSheet(route.params.id.toString(), { ...payload }).then(() => {
+    if (!route.params.id) {
+      Swal.fire('Error', 'No sheet ID provided', 'error')
+      return
+    }
+    jobSheetStore.fetchJobSheet(route.params.id.toString()).finally(() => {
+      loading.value = false
+      changed.value = false
     })
+  })
 }
 </script>
 
@@ -154,7 +166,7 @@ const handleEdit = () => {
         </h3>
       </div>
       <!-- Supervising Engineer -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Supervised by:</span>
         </h2>
@@ -164,7 +176,7 @@ const handleEdit = () => {
         <p>{{ jobSheetStore.jobSheetDetail.engineer.email }}</p>
       </div>
       <!-- Customer  -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">For Customer:</span>
         </h2>
@@ -183,7 +195,7 @@ const handleEdit = () => {
         </h2>
       </div> -->
       <!-- Machine  -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Machine:</span>
         </h2>
@@ -197,7 +209,7 @@ const handleEdit = () => {
         </p>
       </div>
       <!-- Reports  -->
-      <div class="card h-auto md:row-span-2 space-y-2">
+      <div class="card h-auto md:row-span-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Reports:</span>
         </h2>
@@ -220,7 +232,7 @@ const handleEdit = () => {
         </div>
       </div>
       <!-- Finances  -->
-      <div class="card h-auto space-y-2">
+      <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Financials:</span>
         </h2>
@@ -248,7 +260,7 @@ const handleEdit = () => {
       </div>
 
       <!-- Attachments -->
-      <div class="card h-auto space-y-3">
+      <div class="card h-auto space-y-3 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Attachments:</span>
         </h2>
@@ -290,7 +302,7 @@ const handleEdit = () => {
       </div>
 
       <!-- Signature  -->
-      <!-- <div class="card h-auto space-y-2">
+      <!-- <div class="card h-auto space-y-2 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Signature:</span>
           <div class="space-y-3">
