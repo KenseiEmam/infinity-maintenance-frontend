@@ -69,7 +69,7 @@ const submitForm = () => {
       <form @submit.prevent="submitForm" class="space-y-4 w-full">
         <div>
           <label class="block text-sm font-medium">Item Name</label>
-          <input v-model="sparePart.itemName" class="chef-text-input" />
+          <input v-model="sparePart.itemName" class="infinity-text-input" />
           <span v-if="errors.itemName" class="text-red-500 text-sm">
             {{ errors.itemName }}
           </span>
@@ -77,7 +77,7 @@ const submitForm = () => {
 
         <div>
           <label class="block text-sm font-medium">Quantity</label>
-          <input type="number" v-model.number="sparePart.quantity" class="chef-text-input" />
+          <input type="number" v-model.number="sparePart.quantity" class="infinity-text-input" />
           <span v-if="errors.quantity" class="text-red-500 text-sm">
             {{ errors.quantity }}
           </span>
@@ -85,7 +85,7 @@ const submitForm = () => {
 
         <div>
           <label class="block text-sm font-medium">Price</label>
-          <input type="number" v-model.number="sparePart.price" class="chef-text-input" />
+          <input type="number" v-model.number="sparePart.price" class="infinity-text-input" />
           <span v-if="errors.price" class="text-red-500 text-sm">
             {{ errors.price }}
           </span>

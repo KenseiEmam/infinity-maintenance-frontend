@@ -116,7 +116,7 @@ function prevPage() {
         <input
           type="text"
           id="search"
-          class="chef-text-input rounded-full px-3 py-2"
+          class="infinity-text-input rounded-full px-3 py-2"
           v-model="filter.customerName"
           placeholder="Type customer name here..."
         />

@@ -115,7 +115,7 @@ function prevPage() {
         @change="changeFilter"
         name="filter"
         id="filter1"
-        class="md:ml-auto chef-text-input w-full md:w-auto"
+        class="md:ml-auto infinity-text-input w-full md:w-auto"
       >
         <option :value="[]">No Filter</option>
         <option :value="['ENGINEER']">Engineers</option>

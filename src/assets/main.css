@@ -101,7 +101,7 @@ nav a {
   .card {
     @apply rounded-lg p-6 space-y-3  2xl:p-8 flex flex-col items-start bg-secondary-background dark:bg-dark-secbackground border-[1px] border-secondary-text/30 dark:border-dark-sectext/30 shadow;
   }
-  .chef-text-input {
+  .infinity-text-input {
     @apply w-full placeholder:text-secondary-text dark:placeholder:text-dark-sectext bg-secondary-background dark:bg-dark-background 2xl:text-lg p-3 outline-none border-secondary-text dark:border-dark-sectext border rounded-md text-primary-text dark:text-dark-text;
   }
   .phone-input {

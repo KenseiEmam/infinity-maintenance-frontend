@@ -350,7 +350,7 @@ const handleEdit = () => {
             <label class="block text-sm font-medium">Labour Time (minutes)</label>
             <input
               type="number"
-              class="chef-text-input w-full"
+              class="infinity-text-input w-full"
               v-model.number="jobSheetStore.jobSheetDetail.labourTimeMin"
               disabled
             />
@@ -385,7 +385,7 @@ const handleEdit = () => {
           <label class="block text-sm font-medium">Problem Found</label>
           <textarea
             v-model="jobSheetStore.jobSheetDetail.problemFound"
-            class="chef-text-input w-full"
+            class="infinity-text-input w-full"
             placeholder="None Provided"
           ></textarea>
         </div>
@@ -394,7 +394,7 @@ const handleEdit = () => {
           <label class="block text-sm font-medium">Work Report</label>
           <textarea
             v-model="jobSheetStore.jobSheetDetail.workReport"
-            class="chef-text-input w-full"
+            class="infinity-text-input w-full"
             placeholder="None Provided"
           ></textarea>
         </div>
@@ -411,7 +411,7 @@ const handleEdit = () => {
               type="number"
               v-model.number="jobSheetStore.jobSheetDetail.total"
               placeholder="Total"
-              class="chef-text-input flex-1"
+              class="infinity-text-input flex-1"
             />
           </div>
 
@@ -421,7 +421,7 @@ const handleEdit = () => {
               type="number"
               v-model.number="jobSheetStore.jobSheetDetail.totalAfterDisc"
               placeholder="Total After Discount"
-              class="chef-text-input flex-1"
+              class="infinity-text-input flex-1"
             />
           </div>
         </div>
@@ -437,7 +437,7 @@ const handleEdit = () => {
         <input
           type="file"
           accept="image/*"
-          class="chef-text-input"
+          class="infinity-text-input"
           @change="uploadFile"
           :disabled="uploading"
         />

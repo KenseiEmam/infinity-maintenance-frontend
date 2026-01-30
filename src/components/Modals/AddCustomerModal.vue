@@ -62,7 +62,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Customer Name</label>
           <input
             v-model="customer.name"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="Enter customer name"
             :class="{ 'border-red-500': errors.name }"
             required
@@ -72,7 +72,11 @@ const submitForm = () => {
 
         <div class="mb-4">
           <label class="block text-sm font-medium">Address (Optional)</label>
-          <input v-model="customer.address" class="chef-text-input" placeholder="Enter address" />
+          <input
+            v-model="customer.address"
+            class="infinity-text-input"
+            placeholder="Enter address"
+          />
         </div>
         <div class="mb-4">
           <label for="phone" class="block text-sm font-medium">Phone</label>
@@ -80,7 +84,7 @@ const submitForm = () => {
             type="text"
             id="phone"
             v-model="customer.phone"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="e.g. +971501234567"
           />
         </div>

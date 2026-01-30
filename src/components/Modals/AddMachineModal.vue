@@ -70,7 +70,7 @@ const submitForm = () => {
         <!-- Serial -->
         <div>
           <label class="block text-sm font-medium">Serial Number</label>
-          <input v-model="machine.serialNumber" class="chef-text-input" />
+          <input v-model="machine.serialNumber" class="infinity-text-input" />
           <span v-if="errors.serialNumber" class="text-red-500 text-sm">
             {{ errors.serialNumber }}
           </span>
@@ -79,7 +79,7 @@ const submitForm = () => {
         <!-- Customer -->
         <div>
           <label class="block text-sm font-medium">Customer</label>
-          <select v-model="machine.customerId" class="chef-text-input">
+          <select v-model="machine.customerId" class="infinity-text-input">
             <option value="" disabled>Select customer</option>
             <option v-for="c in customers" :key="c.id" :value="c.id">
               {{ c.name }}
@@ -90,7 +90,7 @@ const submitForm = () => {
         <!-- Manufacturer -->
         <div>
           <label class="block text-sm font-medium">Manufacturer</label>
-          <select v-model="machine.manufacturerId" class="chef-text-input">
+          <select v-model="machine.manufacturerId" class="infinity-text-input">
             <option value="" disabled>Select manufacturer</option>
             <option v-for="m in manufacturers" :key="m.id" :value="m.id">
               {{ m.name }}
@@ -101,7 +101,7 @@ const submitForm = () => {
         <!-- Model -->
         <div>
           <label class="block text-sm font-medium">Model</label>
-          <select v-model="machine.modelId" class="chef-text-input">
+          <select v-model="machine.modelId" class="infinity-text-input">
             <option value="" disabled>Select model</option>
             <option
               v-for="m in models.filter((x) => x.manufacturerId === machine.manufacturerId)"

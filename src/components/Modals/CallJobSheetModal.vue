@@ -116,7 +116,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Purchase Order No</label>
           <input
             v-model="jobSheet.purchaseOrderNo"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="Optional"
           />
         </div>
@@ -124,7 +124,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Engineer ID</label>
           <select
             v-model="jobSheet.engineerId"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="Engineer ID"
             :class="{ 'border-red-500': errors.engineerId }"
             required
@@ -140,7 +140,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Problem Found</label>
           <textarea
             v-model="jobSheet.problemFound"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="Optional"
           ></textarea>
         </div>
@@ -149,7 +149,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Work Report</label>
           <textarea
             v-model="jobSheet.workReport"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="Optional"
           ></textarea>
         </div>
@@ -161,7 +161,7 @@ const submitForm = () => {
               type="number"
               v-model.number="jobSheet.total"
               placeholder="Total"
-              class="chef-text-input flex-1"
+              class="infinity-text-input flex-1"
             />
           </div>
 
@@ -171,7 +171,7 @@ const submitForm = () => {
               type="number"
               v-model.number="jobSheet.totalAfterDisc"
               placeholder="Total After Discount"
-              class="chef-text-input flex-1"
+              class="infinity-text-input flex-1"
             />
           </div>
         </div>

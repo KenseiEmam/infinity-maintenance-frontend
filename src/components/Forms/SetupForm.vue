@@ -94,7 +94,7 @@ async function signUpNewUser() {
               <input
                 id="password"
                 v-model="password"
-                class="chef-text-input pr-10 bg-primary-background"
+                class="infinity-text-input pr-10 bg-primary-background"
                 :type="fieldType"
                 placeholder="Enter your password"
                 required
@@ -129,7 +129,7 @@ async function signUpNewUser() {
               <input
                 id="confirm-password"
                 v-model="confirmPassword"
-                class="chef-text-input pr-10 bg-primary-background"
+                class="infinity-text-input pr-10 bg-primary-background"
                 :type="confirmFieldType"
                 placeholder="Re-enter your password"
                 required

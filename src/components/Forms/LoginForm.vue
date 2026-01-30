@@ -5,7 +5,6 @@ import { ref, onMounted } from 'vue'
 import router from '@/router'
 import { useUserStore } from '@/stores/users'
 
-
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
@@ -19,25 +18,18 @@ function obfuscateToggle() {
   eyeSvg.value = fieldType.value === 'password' ? 'eye-closed' : 'eye-open'
 }
 
-
-
 onMounted(() => {
   if (localStorage.getItem('LoggedInUser') && localStorage.getItem('UserID')) {
-    router.push({name:'dashboard-home'})
+    router.push({ name: 'dashboard-home' })
   }
-
-
 })
 
 const handleLogin = async () => {
   try {
     loading.value = true
-    await userStore.login(email.value,password.value).then(()=>{
-       router.push({ name: 'dashboard-home' })
+    await userStore.login(email.value, password.value).then(() => {
+      router.push({ name: 'dashboard-home' })
     })
-
-
-
   } catch (error: any) {
     alert(error.response?.data?.error || error.message || 'Login failed')
   } finally {
@@ -48,15 +40,15 @@ const handleLogin = async () => {
 
 <template>
   <div class="w-full">
-    <form class=" space-y-3 text-left dark:text-white" @submit.prevent="handleLogin">
+    <form class="space-y-3 text-left dark:text-white" @submit.prevent="handleLogin">
       <div class="form-control">
         <label for="email">Email</label>
         <input
           id="email"
           v-model="email"
-          class="chef-text-input"
+          class="infinity-text-input"
           type="email"
-          placeholder="chef@example.com"
+          placeholder="infinity@example.com"
           required
         />
       </div>
@@ -67,7 +59,7 @@ const handleLogin = async () => {
           <input
             id="password"
             v-model="password"
-            class="chef-text-input pr-10"
+            class="infinity-text-input pr-10"
             :type="fieldType"
             placeholder="*******"
             required
@@ -77,7 +69,11 @@ const handleLogin = async () => {
             @click="obfuscateToggle"
             class="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:opacity-30"
           >
-            <img :src="`/${eyeSvg}.svg`" class="w-6 cursor-pointer invert-[100%] dark:invert-[0%]" alt="toggle visibility" />
+            <img
+              :src="`/${eyeSvg}.svg`"
+              class="w-6 cursor-pointer invert-[100%] dark:invert-[0%]"
+              alt="toggle visibility"
+            />
           </button>
         </div>
       </div>

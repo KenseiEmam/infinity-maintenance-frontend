@@ -49,7 +49,11 @@ const submitForm = () => {
       <form @submit.prevent="submitForm" class="space-y-4 w-full">
         <div>
           <label class="block text-sm font-medium">Name</label>
-          <input v-model="manufacturer.name" class="chef-text-input" placeholder="e.g. Siemens" />
+          <input
+            v-model="manufacturer.name"
+            class="infinity-text-input"
+            placeholder="e.g. Siemens"
+          />
           <span v-if="errors.name" class="text-red-500 text-sm">
             {{ errors.name }}
           </span>

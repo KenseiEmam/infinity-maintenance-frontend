@@ -96,7 +96,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Customer</label>
           <select
             v-model="callForm.customerId"
-            class="chef-text-input"
+            class="infinity-text-input"
             :class="{ 'border-red-500': errors.customerId }"
           >
             <option value="" disabled>Select a customer</option>
@@ -116,7 +116,7 @@ const submitForm = () => {
         <!-- Machine -->
         <div v-if="callForm.customerId" class="mb-4">
           <label class="block text-sm font-medium">Machine (optional)</label>
-          <select v-model="callForm.machineId" class="chef-text-input">
+          <select v-model="callForm.machineId" class="infinity-text-input">
             <option value="">No machine</option>
             <option v-for="machine in machineStore.machines" :key="machine.id" :value="machine.id">
               {{ machine.model.name }} — {{ machine.serialNumber }}
@@ -129,7 +129,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Description</label>
           <textarea
             v-model="callForm.description"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="Describe the issue"
             :class="{ 'border-red-500': errors.description }"
           ></textarea>
@@ -141,7 +141,7 @@ const submitForm = () => {
         <!-- Call Time -->
         <div class="mb-6">
           <label class="block text-sm font-medium">Call Time (optional)</label>
-          <input type="datetime-local" v-model="callForm.callTime" class="chef-text-input" />
+          <input type="datetime-local" v-model="callForm.callTime" class="infinity-text-input" />
         </div>
 
         <!-- Actions -->

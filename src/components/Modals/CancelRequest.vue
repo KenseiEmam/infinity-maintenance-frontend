@@ -66,7 +66,7 @@ const submitForm = () => {
           <label class="block text-sm font-medium">Engineer</label>
           <select
             v-model="assignedToId"
-            class="chef-text-input"
+            class="infinity-text-input"
             :class="{ 'border-red-500': errors.assignedToId }"
           >
             <option value="" disabled>Select an engineer</option>

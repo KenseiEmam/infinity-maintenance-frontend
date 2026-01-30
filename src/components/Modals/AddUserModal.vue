@@ -79,7 +79,7 @@ const submitForm = async () => {
               role="text"
               id="name"
               v-model="user.name"
-              class="chef-text-input"
+              class="infinity-text-input"
               required
               placeholder="example: John Doe"
               :class="{ 'border-red-500': errors.name }"
@@ -94,7 +94,7 @@ const submitForm = async () => {
               role="text"
               id="email"
               v-model="user.email"
-              class="chef-text-input"
+              class="infinity-text-input"
               required
               placeholder="example: example@infinitymedicals.ae"
               :class="{ 'border-red-500': errors.email }"
@@ -104,7 +104,7 @@ const submitForm = async () => {
           <!-- role Field -->
           <div class="mb-4">
             <label for="user" class="block text-sm font-medium">User Role</label>
-            <select id="role" v-model="user.role" class="chef-text-input" required>
+            <select id="role" v-model="user.role" class="infinity-text-input" required>
               <option value="" disabled>Select role</option>
               <option value="ENGINEER">Engineer</option>
               <option value="ADMIN">Administrator</option>

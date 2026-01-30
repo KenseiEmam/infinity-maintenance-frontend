@@ -73,7 +73,7 @@ const submitForm = async () => {
             <select
               id="type"
               v-model="user"
-              class="chef-text-input"
+              class="infinity-text-input"
               :class="{ 'border-red-500': errors.type }"
             >
               <option :value="undefined" disabled>Select Engineer</option>

@@ -56,7 +56,7 @@ const submitForm = () => {
         <!-- Name -->
         <div>
           <label class="block text-sm font-medium">Model Name</label>
-          <input v-model="model.name" class="chef-text-input" placeholder="e.g. X200 Pro" />
+          <input v-model="model.name" class="infinity-text-input" placeholder="e.g. X200 Pro" />
           <span v-if="errors.name" class="text-red-500 text-sm">
             {{ errors.name }}
           </span>
@@ -65,7 +65,7 @@ const submitForm = () => {
         <!-- Manufacturer -->
         <div>
           <label class="block text-sm font-medium">Manufacturer</label>
-          <select v-model="model.manufacturerId" class="chef-text-input">
+          <select v-model="model.manufacturerId" class="infinity-text-input">
             <option value="" disabled>Select manufacturer</option>
             <option v-for="m in manufacturers" :key="m.id" :value="m.id">
               {{ m.name }}

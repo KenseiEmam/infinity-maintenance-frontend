@@ -82,7 +82,7 @@ const submitForm = async () => {
             type="text"
             id="name"
             v-model="customer.name"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="e.g. John Doe"
             :class="{ 'border-red-500': errors.name }"
           />
@@ -96,7 +96,7 @@ const submitForm = async () => {
             type="text"
             id="address"
             v-model="customer.address"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="e.g. 123 Street, City"
           />
         </div>
@@ -108,7 +108,7 @@ const submitForm = async () => {
             type="text"
             id="phone"
             v-model="customer.phone"
-            class="chef-text-input"
+            class="infinity-text-input"
             placeholder="e.g. +971501234567"
           />
         </div>

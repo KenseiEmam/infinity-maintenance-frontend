@@ -59,7 +59,7 @@ const submitForm = () => {
       <form @submit.prevent="submitForm" class="space-y-4 w-full">
         <div>
           <label class="block text-sm font-medium">Laser Type</label>
-          <input v-model="laser.laserType" class="chef-text-input" />
+          <input v-model="laser.laserType" class="infinity-text-input" />
           <span v-if="errors.laserType" class="text-red-500 text-sm">
             {{ errors.laserType }}
           </span>
@@ -67,12 +67,12 @@ const submitForm = () => {
 
         <div>
           <label class="block text-sm font-medium">Lamp Counter</label>
-          <input type="number" v-model.number="laser.lampCounter" class="chef-text-input" />
+          <input type="number" v-model.number="laser.lampCounter" class="infinity-text-input" />
         </div>
 
         <div>
           <label class="block text-sm font-medium">Voltage</label>
-          <input type="number" v-model.number="laser.voltage" class="chef-text-input" />
+          <input type="number" v-model.number="laser.voltage" class="infinity-text-input" />
         </div>
 
         <div class="flex justify-end gap-2 pt-4">
