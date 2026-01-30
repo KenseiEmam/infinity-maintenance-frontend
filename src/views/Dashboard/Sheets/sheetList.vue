@@ -2,11 +2,13 @@
 <script setup lang="ts">
 import AddjobSheetModal from '@/components/Modals/AddJobSheetModal.vue'
 import { useJobSheetStore } from '@/stores/jobSheetStore'
+import { useUserStore } from '@/stores/users'
+import Swal from 'sweetalert2'
 import { onMounted, ref, watch, computed } from 'vue'
 
 const jobSheetStore = useJobSheetStore()
 const loading = ref(true)
-
+const userStore = useUserStore()
 // Filters
 type Filter = {
   serialNumber?: string
@@ -71,7 +73,24 @@ const handleAdd = (event: any) => {
     fetchJobSheets()
   })
 }
-
+async function handleDelete(id: string) {
+  Swal.fire({
+    title: 'Are you sure you want to DELETE this?',
+    text: 'All records of this item and related items will be lost completely!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      loading.value = true
+      await jobSheetStore.deleteJobSheet(id).then(() => {
+        jobSheetStore.fetchJobSheets(filter.value, page.value, pageSize.value).finally(() => {
+          loading.value = false
+        })
+      })
+    }
+  })
+}
 // Pagination actions
 function nextPage() {
   if (page.value < totalPages.value) page.value++
@@ -133,7 +152,7 @@ function prevPage() {
           <p class="font-black">Customer: {{ jobSheet.customer.name }}</p>
           <p class="text-teritiary text-sm">Engineer: {{ jobSheet.engineer.name }}</p>
         </div>
-        <div class="w-full md:w-auto space-y-3" v-if="jobSheet.createdAt">
+        <div class="w-full flex flex-col md:w-auto space-y-3" v-if="jobSheet.createdAt">
           <p class="text-teritiary text-sm">
             Created
             {{
@@ -149,6 +168,13 @@ function prevPage() {
             @click="$router.push({ name: 'single-sheet', params: { id: jobSheet.id } })"
           >
             View Sheet
+          </button>
+          <button
+            v-if="jobSheet.id && userStore.loggedInUser?.role === 'ADMIN'"
+            class="btn-sm-delete md:w-auto w-full"
+            @click="handleDelete(jobSheet.id)"
+          >
+            Delete Sheet
           </button>
         </div>
       </div>

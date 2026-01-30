@@ -5,7 +5,9 @@ import AddManufacturerModal from '@/components/Modals/AddManufacturerModal.vue'
 import AddModelModal from '@/components/Modals/AddModelModal.vue'
 import EditMachineModal from '@/components/Modals/EditMachineModal.vue'
 import { useCustomerStore } from '@/stores/customerStore'
-
+import { useUserStore } from '@/stores/users'
+import Swal from 'sweetalert2'
+const userStore = useUserStore()
 import { useMachineStore } from '@/stores/machineStore'
 import { onMounted, ref, watch, computed } from 'vue'
 const customerStore = useCustomerStore()
@@ -69,7 +71,24 @@ onMounted(() => {
     })
   })
 })
-
+async function handleDelete(id: string) {
+  Swal.fire({
+    title: 'Are you sure you want to DELETE this?',
+    text: 'All records of this item and related items will be lost completely!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      loading.value = true
+      await machineStore.deleteMachine(id).then(() => {
+        machineStore.fetchMachines(page.value, pageSize.value).finally(() => {
+          loading.value = false
+        })
+      })
+    }
+  })
+}
 const handleAdd = (event: any) => {
   loading.value = true
   modalLoad.value = true
@@ -204,9 +223,16 @@ function prevPage() {
             {{ machine.customer.name || 'Missing Address' }}
           </p>
         </div>
-        <div class="flex gap-2 w-full md:w-auto md:ml-auto">
+        <div class="flex gap-2 w-full flex-col md:w-auto md:ml-auto">
           <button class="btn-lg-outline w-full md:w-auto" @click="editMachine = machine">
             Edit
+          </button>
+          <button
+            v-if="machine.id && userStore.loggedInUser?.role === 'ADMIN'"
+            class="btn-sm-delete md:w-auto w-full"
+            @click="handleDelete(machine.id)"
+          >
+            Delete Machine
           </button>
         </div>
       </div>

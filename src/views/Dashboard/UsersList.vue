@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import AddUserModal from '@/components/Modals/AddUserModal.vue'
 import { useUserStore } from '@/stores/users'
+import Swal from 'sweetalert2'
 import { onMounted, ref, watch, computed } from 'vue'
 
 const userStore = useUserStore()
@@ -54,7 +55,24 @@ watch(
   },
   { deep: true },
 )
-
+async function handleDelete(id: string) {
+  Swal.fire({
+    title: 'Are you sure you want to DELETE this?',
+    text: 'All records of this item and related items will be lost completely!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      loading.value = true
+      await userStore.deleteUser(id).then(() => {
+        userStore.fetchUsers(filter.value, page.value, pageSize.value).finally(() => {
+          loading.value = false
+        })
+      })
+    }
+  })
+}
 onMounted(() => {
   loading.value = true
   userStore.fetchUsers(filter.value, page.value, pageSize.value).finally(() => {
@@ -127,7 +145,7 @@ function prevPage() {
     <div v-else class="flex flex-col h-full gap-3">
       <div
         v-for="user in userStore.users"
-        class="card gap-4 md:flex-row items-center justify-between"
+        class="card gap-4 md:flex-row items-center"
         :key="user.id"
       >
         <div>
@@ -140,7 +158,7 @@ function prevPage() {
         </div>
         <label
           v-if="userStore.loggedInUser?.role === 'ADMIN' && userStore.loggedInUser?.id !== user.id"
-          class="inline-flex relative items-center cursor-pointer"
+          class="inline-flex relative items-center cursor-pointer md:ml-auto"
         >
           <input
             type="checkbox"
@@ -158,7 +176,14 @@ function prevPage() {
             {{ user.role === 'ADMIN' ? 'Admin' : 'Engineer' }}
           </span>
         </label>
-        <p class="font-semibold text-teritiary/40" v-else>ME</p>
+        <p class="font-semibold text-teritiary/40 md:ml-auto" v-else>ME</p>
+        <button
+          v-if="userStore.loggedInUser?.id && userStore.loggedInUser?.role === 'ADMIN'"
+          class="btn-sm-delete md:w-auto w-full"
+          @click="handleDelete(userStore.loggedInUser?.id)"
+        >
+          Delete User
+        </button>
       </div>
 
       <!-- Pagination Controls -->
