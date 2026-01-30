@@ -9,7 +9,7 @@ const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const userStore = useUserStore()
-
+const emits = defineEmits(['forgot'])
 const eyeSvg = ref('eye-closed')
 const fieldType = ref<'password' | 'text'>('password')
 
@@ -77,11 +77,6 @@ const handleLogin = async () => {
           </button>
         </div>
       </div>
-      <div>
-        <router-link :to="{ name: 'forgot-password' }" class="text-secondary">
-          Forgotten Password
-        </router-link>
-      </div>
 
       <input
         type="submit"
@@ -90,5 +85,13 @@ const handleLogin = async () => {
         :disabled="loading"
       />
     </form>
+    <div>
+      <button
+        @click="emits('forgot')"
+        class="text-secondary mt-3 cursor-pointer hover:text-primary"
+      >
+        Forgotten Password
+      </button>
+    </div>
   </div>
 </template>

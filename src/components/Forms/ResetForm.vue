@@ -3,7 +3,9 @@
 import { ref, computed } from 'vue'
 import router from '@/router'
 import Swal from 'sweetalert2'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 import { useUserStore } from '@/stores/users'
 
 const fullName = ref('')
@@ -46,23 +48,26 @@ async function signUpNewUser() {
     Swal.fire('Error', 'Please meet all requirements before submitting', 'error')
     return
   }
-
+  console.log(route.query.token)
+  if (!route.query.token) {
+    Swal.fire('Error', 'Your token has no reset request', 'error')
+    return
+  }
+  if (!route.query.id) {
+    Swal.fire('Error', 'Your id has no reset request', 'error')
+    return
+  }
   loading.value = true
 
   try {
-    const createdUser = await userStore.createAdmin({
-      email: email.value,
-      password: password.value,
-      name: fullName.value,
+    await userStore.resetPassword({
+      token: route.query.token.toString(),
+      newPassword: password.value,
+      userId: route.query.id.toString(),
     })
-
-    if (!createdUser) throw new Error('User creation failed')
-
-    Swal.fire('Success', 'Account created successfully', 'success')
 
     // Reset form
     fullName.value = ''
-    email.value = ''
     password.value = ''
     confirmPassword.value = ''
     showPassword.value = false
@@ -82,32 +87,6 @@ async function signUpNewUser() {
     <form class="space-y-3 dark:text-white" @submit.prevent="signUpNewUser">
       <div class="2xl:flex gap-3">
         <div class="w-full space-y-3">
-          <!-- Full Name Field -->
-          <div class="form-control">
-            <label for="full-name" class="block text-sm font-medium">Full Name</label>
-            <input
-              id="full-name"
-              v-model="fullName"
-              class="infinity-text-input bg-primary-background"
-              type="text"
-              placeholder="John Doe"
-              required
-            />
-          </div>
-
-          <!-- Email Field -->
-          <div class="form-control">
-            <label for="email" class="block text-sm font-medium">Email</label>
-            <input
-              id="email"
-              v-model="email"
-              class="infinity-text-input bg-primary-background"
-              type="email"
-              placeholder="admin@example.ae"
-              required
-            />
-          </div>
-
           <!-- Password Field -->
           <div class="form-control relative">
             <label for="password" class="block text-sm font-medium">Password</label>

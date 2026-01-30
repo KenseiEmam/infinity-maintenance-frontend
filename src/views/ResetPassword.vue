@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import LoginForm from '@/components/Forms/LoginForm.vue'
-import RegisterForm from '@/components/Forms/RegisterForm.vue'
 import { useUserStore } from '@/stores/users'
 import router from '@/router'
 import { onMounted, ref } from 'vue'
-import ForgotPassword from '@/components/Forms/ForgotPassword.vue'
+import SetupForm from '@/components/Forms/SetupForm.vue'
 const loading = ref(true)
 const noAdmin = ref(true)
-const forgotPassword = ref(false)
 const userStore = useUserStore()
 onMounted(() => {
   if (localStorage.getItem('LoggedInUser') && localStorage.getItem('UserID')) {
@@ -36,19 +33,12 @@ onMounted(() => {
       ></div>
       <p class="text-sm text-center animate-pulse">Loading chunks..</p>
     </div>
-    <div v-else-if="forgotPassword" class="card text-center items-center w-full">
-      <ForgotPassword />
-    </div>
-    <div v-else-if="!noAdmin" class="card text-center items-center w-full">
-      <LoginForm @forgot="forgotPassword = true" />
-    </div>
     <div v-else class="card text-center items-center w-full">
-      <h3 class="contentH-small">Register Admin:</h3>
+      <h3 class="contentH-small">ResetPassword:</h3>
       <p class="text-sm text-teritiary">
-        As this is your first time exploring this dashboard, we require that you register at least
-        one admin!
+        You have been asked to reet your password, enter a valid password below!
       </p>
-      <RegisterForm />
+      <SetupForm />
     </div>
   </section>
 </template>

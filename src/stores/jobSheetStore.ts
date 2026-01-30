@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/no-new-array
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
@@ -150,6 +151,113 @@ export const useJobSheetStore = defineStore('jobSheet', () => {
       showError(getErrorMessage(err, 'Failed to fetch attachments'))
     }
   }
+  /* ================== Dashboard Helpers ================== */
+  async function fetchAllForDashboard() {
+    try {
+      // fetch a large page size to get all sheets (or implement server-side aggregation later)
+      const data = await jobSheetServices.fetchJobSheets({}, 1, 1000)
+      jobSheets.value = data.jobSheets
+      totalCount.value = data.count
+      return data.jobSheets
+    } catch (err: any) {
+      showError(getErrorMessage(err, 'Failed to fetch JobSheets for dashboard'))
+      return []
+    }
+  }
+
+  function aggregateForChart(
+    jobSheets: JobSheet[],
+    range: 'past_year' | 'last_3_months' | 'this_month',
+  ) {
+    const now = new Date()
+    let labels: string[] = []
+    let createdData: number[] = []
+    let completedData: number[] = []
+
+    if (range === 'past_year') {
+      // Initialize arrays
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(now)
+        d.setMonth(now.getMonth() - i)
+        labels.push(d.toLocaleString('default', { month: 'short', year: 'numeric' }))
+        createdData.push(0)
+        completedData.push(0)
+      }
+
+      jobSheets.forEach((js) => {
+        if (!js.createdAt) return
+        const created = new Date(js.createdAt)
+        const monthDiff =
+          (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth())
+        const index = 11 - monthDiff
+        if (index >= 0 && index < 12) {
+          createdData[index]! += 1 // Non-null assertion
+          if (js.completionTime) completedData[index]! += 1
+        }
+      })
+    }
+
+    if (range === 'last_3_months') {
+      labels = ['This Month', '1 Month Ago', '2 Months Ago']
+      createdData = [0, 0, 0]
+      completedData = [0, 0, 0]
+
+      jobSheets.forEach((js) => {
+        if (!js.createdAt) return
+        const created = new Date(js.createdAt)
+        for (let offset = 0; offset < 3; offset++) {
+          const target = new Date(now)
+          target.setMonth(now.getMonth() - offset)
+
+          if (
+            created.getMonth() === target.getMonth() &&
+            created.getFullYear() === target.getFullYear()
+          ) {
+            createdData[offset]! += 1
+            if (js.completionTime) completedData[offset]! += 1
+          }
+        }
+      })
+    }
+
+    if (range === 'this_month') {
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+      labels = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`)
+      createdData = new Array(daysInMonth).fill(0)
+      completedData = new Array(daysInMonth).fill(0)
+
+      jobSheets.forEach((js) => {
+        if (!js.createdAt) return
+        const created = new Date(js.createdAt)
+        const day = created.getDate()
+        if (
+          created.getMonth() === now.getMonth() &&
+          created.getFullYear() === now.getFullYear() &&
+          day >= 1 &&
+          day <= daysInMonth
+        ) {
+          createdData[day - 1]! += 1
+          if (js.completionTime) completedData[day - 1]! += 1
+        }
+      })
+    }
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Created Jobsheets',
+          backgroundColor: '#0a6134',
+          data: createdData,
+        },
+        {
+          label: 'Completed Jobsheets',
+          backgroundColor: '#f87979',
+          data: completedData,
+        },
+      ],
+    }
+  }
 
   return {
     jobSheets,
@@ -163,5 +271,7 @@ export const useJobSheetStore = defineStore('jobSheet', () => {
     deleteJobSheet,
     uploadAttachment,
     fetchAttachments,
+    fetchAllForDashboard,
+    aggregateForChart,
   }
 })

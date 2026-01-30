@@ -10,6 +10,7 @@ import SingleSheet from '@/views/Dashboard/Sheets/singleSheet.vue'
 import CallList from '@/views/Dashboard/Calls/callList.vue'
 import SingleCall from '@/views/Dashboard/Calls/singleCall.vue'
 import ScheduleVisits from '@/views/Dashboard/ScheduleVisits.vue'
+import ResetPassword from '@/views/ResetPassword.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,9 +28,9 @@ const router = createRouter({
       component: SetupPassword,
     },
     {
-      path: '/forgot-password',
-      name: 'forgot-password',
-      component: LoginVue,
+      path: '/reset-password',
+      name: 'reset-password',
+      component: ResetPassword,
     },
 
     {
