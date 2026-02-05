@@ -2,7 +2,8 @@
 import { useUserStore } from '@/stores/users'
 import router from '@/router'
 import { onMounted, ref } from 'vue'
-import SetupForm from '@/components/Forms/SetupForm.vue'
+
+import ResetForm from '@/components/Forms/ResetForm.vue'
 const loading = ref(true)
 const noAdmin = ref(true)
 const userStore = useUserStore()
@@ -36,9 +37,9 @@ onMounted(() => {
     <div v-else class="card text-center items-center w-full">
       <h3 class="contentH-small">ResetPassword:</h3>
       <p class="text-sm text-teritiary">
-        You have been asked to reet your password, enter a valid password below!
+        You have been asked to reset your password, enter a valid password below!
       </p>
-      <SetupForm />
+      <ResetForm />
     </div>
   </section>
 </template>
