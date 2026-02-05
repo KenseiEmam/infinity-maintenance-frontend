@@ -178,7 +178,11 @@ function prevPage() {
         </label>
         <p class="font-semibold text-teritiary/40 md:ml-auto" v-else>ME</p>
         <button
-          v-if="userStore.loggedInUser?.id && userStore.loggedInUser?.role === 'ADMIN'"
+          v-if="
+            userStore.loggedInUser?.id &&
+            user.id !== userStore.loggedInUser.id &&
+            userStore.loggedInUser.role === 'ADMIN'
+          "
           class="btn-sm-delete md:w-auto w-full"
           @click="handleDelete(userStore.loggedInUser?.id)"
         >
