@@ -160,7 +160,7 @@ async function signUpNewUser() {
       <input
         type="submit"
         class="btn-lg w-full mt-8"
-        :value="loading ? 'Loading' : 'Sign Up'"
+        :value="loading ? 'Loading' : 'Reset Password'"
         :disabled="loading || !canSubmit"
       />
     </form>
