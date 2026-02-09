@@ -27,7 +27,7 @@ const isDashboard = computed(() => route.path.startsWith('/dashboard'))
 <template>
   <div
     v-if="!isAuth && isDashboard"
-    class="md:flex-row flex flex-col w-full h-screen max-w-screen overflow-x-hidden bg-primary-background relative"
+    class="md:flex-row flex flex-col w-full h-screen w-screen overflow-hidden bg-primary-background relative"
   >
     <SidebarVue />
     <div
