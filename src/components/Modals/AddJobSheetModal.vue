@@ -16,7 +16,7 @@ const loadMachines = ref(false)
 const emits = defineEmits(['close', 'submit'])
 onMounted(() => {
   customerStore.fetchCustomers().then(() => {
-    userStore.fetchUsers({ role: 'ENGINEER' }).then(() => {
+    userStore.fetchUsers({}).then(() => {
       loadEng.value = false
     })
   })
@@ -125,6 +125,7 @@ const submitForm = () => {
             <option value="" disabled>Select a Service Type</option>
             <option value="INSTALLATION">INSTALLATION</option>
             <option value="CONTRACT">CONTRACT</option>
+            <option value="WARRANTY">WARRANTY</option>
             <option value="PAID">PAID</option>
           </select>
           <span v-if="errors.serviceType" class="text-red-500 text-sm">{{

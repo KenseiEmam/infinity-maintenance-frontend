@@ -19,7 +19,7 @@ const errors = ref<{ assignedToId?: string }>({})
 const loadingEngineers = ref(true)
 
 onMounted(() => {
-  userStore.fetchUsers({ role: 'ENGINEER' }).finally(() => {
+  userStore.fetchUsers({}).finally(() => {
     loadingEngineers.value = false
   })
 })

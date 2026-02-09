@@ -10,7 +10,7 @@ import Vue3Signature from 'vue3-signature'
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import AddSparePartModal from '@/components/Modals/AddSparePartModal.vue'
 import AddLaserDataModal from '@/components/Modals/AddLaserDataModal.vue'
-
+import logoUrl from '@/assets/logo.png'
 const jobSheetStore = useJobSheetStore()
 const loading = ref(true)
 const uploading = ref(false)
@@ -60,107 +60,235 @@ async function uploadFile(e: Event) {
 // PDF Generator
 async function generateServicePDF() {
   const sheet = jobSheetStore.jobSheetDetail
-  if (!sheet) return
-  if (!sheet.createdAt) return
+  if (!sheet || !sheet.createdAt) return
+
   const pdfDoc = await PDFDocument.create()
   const page = pdfDoc.addPage([595.28, 841.89]) // A4
 
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-  let y = 800
-  const lineHeight = 16
+  const { width, height } = page.getSize()
 
-  function draw(text: string, size = 11, bold = false) {
-    page.drawText(text ?? '-', {
-      x: 40,
-      y,
+  let y = height - 40
+
+  const safeY = (val: number) => (Number.isFinite(val) ? val : 40)
+
+  function text(t: string, x: number, yy: number, size = 10, b = false) {
+    const drawY = safeY(yy)
+    page.drawText(t ?? '-', {
+      x,
+      y: drawY,
       size,
+      font: b ? bold : font,
+      color: rgb(0, 0, 0),
+    })
+  }
+
+  function box(x: number, yy: number, w: number, h: number) {
+    const drawY = safeY(yy)
+    page.drawRectangle({
+      x,
+      y: drawY,
+      width: w,
+      height: h,
+      borderWidth: 1,
+      borderColor: rgb(0, 0, 0),
+    })
+  }
+
+  function row(cols: string[], xs: number[], yy: number) {
+    const rowHeight = 16
+    const baseY = safeY(yy)
+
+    cols.forEach((c, i) => text(c, (xs[i] || 0) + 4, baseY - 12, 9))
+
+    page.drawLine({
+      start: { x: 40, y: baseY - rowHeight },
+      end: { x: width - 40, y: baseY - rowHeight },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    })
+
+    return baseY - rowHeight
+  }
+
+  // ================= HEADER =================
+  try {
+    const logoBytes = await fetch(logoUrl).then((r) => r.arrayBuffer())
+    const logo = await pdfDoc.embedPng(logoBytes)
+
+    page.drawImage(logo, { x: 40, y: height - 80, height: 40, width: 20 })
+  } catch {}
+
+  text('INFINITY', 70, height - 55, 16, true)
+  text('MEDICALS', 70, height - 75, 16, true)
+  text('SERVICE REPORT', 320, height - 45, 13, true)
+  text('Phone/Fax:(+965)2261 47 67', 320, height - 55, 9)
+  text('Mob:(+965)50553092', 320, height - 65, 9)
+  text('Email:kuwait@infinitymedicalkwt.com', 320, height - 75, 9)
+  text('Website:www.infinitymedicalkwt.com', 320, height - 85, 9)
+
+  y -= 70
+  // ================= TIME =================
+  const labourMin = sheet.labourTimeMin ?? 0
+  const h = Math.floor(labourMin / 60)
+  const m = labourMin % 60
+  // ================= INFO =================
+  box(40, y - 80, width - 80, 80)
+  text(`Date: ${new Date(sheet.createdAt).toLocaleDateString()}`, 50, y - 20)
+  text(`Service Engineer: ${sheet.engineer?.name ?? '-'}`, 50, y - 35)
+  text(`Order Number: ${sheet.purchaseOrderNo ?? '-'}`, 50, y - 65)
+  const serviceTypes = ['INSTALLATION', 'CONTRACT', 'WARRANTY', 'PAID']
+  const boxSize = 10
+  const startX = 300
+  let boxY = y - 10
+
+  serviceTypes.forEach((type) => {
+    // Draw checkbox
+    page.drawRectangle({
+      x: startX,
+      y: boxY - boxSize + 2,
+      width: boxSize,
+      height: boxSize,
+      borderWidth: 1,
+      borderColor: rgb(0, 0, 0),
+    })
+
+    // If this is the selected service type, add a checkmark
+    if (sheet.serviceType === type) {
+      page.drawText('X', {
+        x: startX + 1,
+        y: boxY - boxSize + 3,
+        size: 12,
+        font: bold,
+        color: rgb(0, 0, 0),
+      })
+    }
+
+    // Draw the label
+    page.drawText(type, {
+      x: startX + boxSize + 4,
+      y: boxY - boxSize + 1,
+      size: 10,
       font,
       color: rgb(0, 0, 0),
     })
-    y -= lineHeight
-    console.log(bold)
-  }
 
-  // ---- HEADER ----
-  draw('SERVICE REPORT', 16)
-  y -= 10
+    // Move down for next checkbox
+    boxY -= 16
+  })
+  text(`Labour Time: ${h}h ${m}m`, 50, y - 50)
+  y -= 100
 
-  draw(`Sheet ID: ${sheet.id}`)
-  draw(`Date: ${new Date(sheet.createdAt).toLocaleDateString()}`)
-  draw(`Service Type: ${sheet.engineer?.serviceType}`)
-  draw(`Engineer: ${sheet.engineer?.name}`)
-  draw(`Customer: ${sheet.customer?.name}`)
-  draw(`Phone: ${sheet.customer?.phone}`)
-  draw(`Machine SN: ${sheet.machine?.serialNumber}`)
-  draw(`Warranty: ${sheet.machine?.underWarranty ? 'YES' : 'NO'}`)
-
-  y -= 10
-
-  // ---- TIME ----
-  draw('TIME DATA', 13)
-  draw(`Arrival: ${sheet.arrivalTime ?? '-'}`)
-  draw(`Completion: ${sheet.completionTime ?? '-'}`)
-  draw(`Labour: ${sheet.labourTimeMin ?? '-'} minutes`)
-
-  y -= 10
-
-  // ---- REPORT ----
-  draw('PROBLEM FOUND', 13)
-  draw(sheet.problemFound || '-')
-
-  y -= 5
-  draw('WORK REPORT', 13)
-  draw(sheet.workReport || '-')
+  // ================= CUSTOMER =================
+  box(40, y - 90, width - 80, 90)
+  text('Customer Information:', 50, y - 20, 10, true)
+  text(`Customer: ${sheet.customer?.name ?? '-'}`, 50, y - 35)
+  text(`Phone: ${sheet.customer?.phone ?? '-'}`, 50, y - 50)
+  text(`Address: ${sheet.customer?.address ?? '-'}`, 50, y - 65)
+  text('Machine Information:', 320, y - 20, 10, true)
+  text(`Machine SN: ${sheet.machine?.serialNumber ?? '-'}`, 320, y - 35)
+  text(`Model: ${sheet.machine?.model?.name ?? '-'}`, 320, y - 50)
+  text(`Manufacturer: ${sheet.machine?.model?.manufacturer?.name ?? '-'}`, 320, y - 65)
+  text(`Warranty: ${sheet.machine?.underWarranty ? 'YES' : 'NO'}`, 320, y - 80)
 
   y -= 100
 
-  // ---- SPARE PARTS ----
-  draw('SPARE PARTS', 13)
+  // ================= PROBLEM =================
+  box(40, y - 80, width - 80, 80)
+  text('Problem Found / Comments', 50, y - 15, 10, true)
+  text(sheet.problemFound || '-', 50, y - 35)
+  y -= 90
 
+  // ================= WORK =================
+  box(40, y - 80, width - 80, 80)
+  text('Work Report', 50, y - 15, 10, true)
+  text(sheet.workReport || '-', 50, y - 35)
+  y -= 100
+
+  // ================= SPARE TABLE =================
+  text('Parts', 40, y, 10, true)
+  y -= 5
+  box(40, y - 20, width - 80, 20)
+
+  const spX = [40, 320, 420]
+  y = row(['Item', 'Qty', 'Price'], spX, y)
+  let sum = 0
   if (sheet.spareParts?.length) {
     sheet.spareParts.forEach((sp) => {
-      draw(`${sp.itemName}  |  Qty: ${sp.quantity}  |  Price: ${sp.price}`)
+      y = row([sp.itemName ?? '-', String(sp.quantity), String(sp.price)], spX, y)
+      sum += sp.price
     })
+    y = row(['Total Price', '', sum + ''], spX, y)
   } else {
-    draw('No spare parts')
+    y = row(['No spare parts', '', ''], spX, y)
   }
 
-  y -= 20
+  y -= 25
 
-  // ---- LASER DATA ----
-  draw('LASER DATA', 13)
+  // ================= LASER TABLE =================
+  text('LASER DATA', 40, y, 10, true)
+  y -= 5
+  box(40, y - 20, width - 80, 20)
+
+  const lX = [40, 250, 420]
+  y = row(['Type', 'Lamp', 'Voltage'], lX, y)
 
   if (sheet.laserData?.length) {
-    sheet.laserData.forEach((sp) => {
-      draw(`${sp.laserType}  |  Lamp: ${sp.lampCounter}  |  Voltage: ${sp.voltage}`)
+    sheet.laserData.forEach((l) => {
+      y = row([l.laserType ?? '-', String(l.lampCounter), String(l.voltage)], lX, y)
     })
   } else {
-    draw('No laser data')
+    y = row(['No laser data', '', ''], lX, y)
   }
 
-  y -= 20
+  y -= 35
 
-  y -= 15
-
-  // ---- SIGNATURE ----
-  draw('CUSTOMER SIGNATURE', 13)
+  // ================= SIGNATURE =================
+  box(40, y - 70, width - 80, 70)
+  text('Customer Signature', 60, y - 15, 10, true)
+  text('Engineer Signature', 350, y - 15, 10, true)
 
   if (sheet.customerSignature) {
     const png = sheet.customerSignature.split(',')[1]
-    if (!png) return
-    const imageBytes = Uint8Array.from(atob(png), (c) => c.charCodeAt(0))
-    const image = await pdfDoc.embedPng(imageBytes)
+    if (png) {
+      const imageBytes = Uint8Array.from(atob(png), (c) => c.charCodeAt(0))
+      const image = await pdfDoc.embedPng(imageBytes)
 
-    page.drawImage(image, {
-      x: 40,
-      y: y - 80,
-      width: 200,
-      height: 80,
-    })
-  } else {
-    draw('No signature provided')
+      page.drawImage(image, {
+        x: 60,
+        y: safeY(y - 60),
+        width: 180,
+        height: 35,
+      })
+    }
   }
+
+  page.drawLine({
+    start: { x: 350, y: safeY(y - 50) },
+    end: { x: 540, y: safeY(y - 50) },
+    thickness: 1,
+    color: rgb(0, 0, 0),
+  })
+  y -= 100
+
+  // ================= SIGNATURE =================
+  box(40, y - 70, width - 80, 70)
+  text('Customer Name:', 60, y - 15, 10, true)
+  text('Signed Date:', 350, y - 15, 10, true)
+  page.drawLine({
+    start: { x: 60, y: safeY(y - 50) },
+    end: { x: 250, y: safeY(y - 50) },
+    thickness: 1,
+    color: rgb(0, 0, 0),
+  })
+  page.drawLine({
+    start: { x: 350, y: safeY(y - 50) },
+    end: { x: 540, y: safeY(y - 50) },
+    thickness: 1,
+    color: rgb(0, 0, 0),
+  })
 
   // ---- SAVE ----
   const pdfBytes = await pdfDoc.save()
@@ -182,6 +310,7 @@ async function generateServicePDF() {
   // Add this at the end of generateServicePDF()
   return pdfBytes
 }
+
 async function shareJobSheet() {
   const sheet = jobSheetStore.jobSheetDetail
   if (!sheet) return
@@ -396,8 +525,11 @@ const handleEdit = () => {
       <!-- Sheet ID -->
       <div class="card h-auto md:col-span-2 space-y-2">
         <h2 class="header-small text-left">
-          <span class="font-black text-sm md:text-base">Sheet ID:</span
-          >{{ jobSheetStore.jobSheetDetail.id }}
+          <span class="font-black text-sm md:text-base">Purchase Order Number:</span
+          >{{
+            jobSheetStore.jobSheetDetail.purchaseOrderNo ||
+            'sheet-id-' + jobSheetStore.jobSheetDetail.id
+          }}
         </h2>
         <h3 v-if="jobSheetStore.jobSheetDetail.createdAt" class="text-teritiary text-sm">
           <span class="font-bold">Created:</span
@@ -439,6 +571,7 @@ const handleEdit = () => {
               <option value="" disabled>Select a Service Type</option>
               <option value="INSTALLATION">INSTALLATION</option>
               <option value="CONTRACT">CONTRACT</option>
+              <option value="WARRANTY">WARRANTY</option>
               <option value="PAID">PAID</option>
             </select>
           </div>

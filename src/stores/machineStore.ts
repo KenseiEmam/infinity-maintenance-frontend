@@ -71,7 +71,6 @@ export const useMachineStore = defineStore('machine', () => {
       const data = await machineServices.fetchMachines(params)
       machines.value = data.machines
       totalCount.value = data.count
-      console.log('BACKEND RETURNED PAGE =', data.machines.page)
     } catch (err: any) {
       showError(err?.response?.data?.error || 'Failed to fetch machines')
     }

@@ -44,6 +44,7 @@ export interface JobSheet {
   problemFound?: string
   workReport?: string
   total?: number
+  purchaseOrderNo?: string
   totalAfterDisc?: number
   customer?: any
   machine?: any
