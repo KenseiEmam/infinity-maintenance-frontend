@@ -24,6 +24,7 @@ export interface JobSheet {
   call?: any
   spareParts?: any[]
   laserData?: any[]
+  serviceType: string
   attachments?: any[]
 }
 export interface Attachment {

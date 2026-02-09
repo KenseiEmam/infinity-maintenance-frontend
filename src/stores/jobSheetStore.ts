@@ -49,6 +49,7 @@ export interface JobSheet {
   machine?: any
   engineer?: any
   call?: any
+  serviceType: string
   spareParts?: any[]
   laserData?: any[]
   attachments?: any[]
