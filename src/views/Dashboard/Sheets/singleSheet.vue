@@ -313,6 +313,7 @@ const handleEdit = () => {
     total: jobSheetStore.jobSheetDetail?.total,
     totalAfterDisc: jobSheetStore.jobSheetDetail?.totalAfterDisc,
     customerSignature: jobSheetStore.jobSheetDetail?.customerSignature,
+    serviceType: jobSheetStore.jobSheetDetail?.serviceType,
 
     spareParts:
       jobSheetStore.jobSheetDetail?.spareParts?.map((sp) => ({
