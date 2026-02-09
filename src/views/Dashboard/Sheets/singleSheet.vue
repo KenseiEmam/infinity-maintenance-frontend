@@ -175,10 +175,37 @@ async function generateServicePDF() {
 
   const a = document.createElement('a')
   a.href = url
-  a.download = `ServiceReport-${sheet.id}.pdf`
+
   a.click()
 
   URL.revokeObjectURL(url)
+  // Add this at the end of generateServicePDF()
+  return pdfBytes
+}
+async function shareJobSheet() {
+  const sheet = jobSheetStore.jobSheetDetail
+  if (!sheet) return
+
+  // Generate PDF and get bytes
+  const pdfBytes = await generateServicePDF()
+  if (!pdfBytes) return
+
+  // Wrap in Uint8Array to satisfy Blob
+  const uint8 = new Uint8Array(pdfBytes)
+
+  const file = new File([uint8], `ServiceReport-${sheet.id}.pdf`, {
+    type: 'application/pdf',
+  })
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    await navigator.share({
+      title: `Service Report ${sheet.id}`,
+      text: 'Service report attached',
+      files: [file],
+    })
+  } else {
+    alert('Native share not supported. PDF downloaded instead.')
+  }
 }
 
 // route
@@ -428,8 +455,8 @@ const handleEdit = () => {
         >
           Visit Related Call
         </button>
-        <button class="btn-lg-outline w-full" @click="generateServicePDF">
-          Download Service Report PDF
+        <button class="btn-lg-outline w-full" @click="shareJobSheet">
+          Share Service Report PDF
         </button>
       </div>
       <!-- Supervising Engineer -->
