@@ -165,7 +165,12 @@ async function generateServicePDF() {
   // ---- SAVE ----
   const pdfBytes = await pdfDoc.save()
 
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+  // Convert to proper ArrayBuffer
+  // FIX TYPE ERROR HERE
+  const buffer = new ArrayBuffer(pdfBytes.length)
+  new Uint8Array(buffer).set(pdfBytes)
+
+  const blob = new Blob([buffer], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
 
   const a = document.createElement('a')
