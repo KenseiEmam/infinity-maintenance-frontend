@@ -13,6 +13,7 @@ const sparePart = ref({
   itemName: '',
   quantity: 1,
   price: 0,
+  discounted: null,
 })
 
 const errors = ref<any>({})
@@ -46,6 +47,7 @@ const submitForm = () => {
     itemName: '',
     quantity: 1,
     price: 0,
+    discounted: null,
   }
 }
 </script>
@@ -69,7 +71,11 @@ const submitForm = () => {
       <form @submit.prevent="submitForm" class="space-y-4 w-full">
         <div>
           <label class="block text-sm font-medium">Item Name</label>
-          <input v-model="sparePart.itemName" class="infinity-text-input" />
+          <input
+            placeholder="Example: Lamp Holder"
+            v-model="sparePart.itemName"
+            class="infinity-text-input"
+          />
           <span v-if="errors.itemName" class="text-red-500 text-sm">
             {{ errors.itemName }}
           </span>
@@ -90,7 +96,15 @@ const submitForm = () => {
             {{ errors.price }}
           </span>
         </div>
-
+        <div>
+          <label class="block text-sm font-medium">Discounted Price</label>
+          <input
+            type="number"
+            placeholder="No Discount"
+            v-model.number="sparePart.discounted"
+            class="infinity-text-input"
+          />
+        </div>
         <div class="flex justify-end gap-2 pt-4">
           <button type="button" class="btn-lg-outline" @click="$emit('close')">Cancel</button>
           <button type="submit" class="btn-lg">Add</button>

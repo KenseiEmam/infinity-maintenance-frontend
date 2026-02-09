@@ -104,9 +104,9 @@ function prevPage() {
   <section class="text-center md:text-left h-full space-y-6">
     <div class="md:flex-row flex-col flex items-center w-full gap-3">
       <div>
-        <h3 class="header-medium">Job Sheets List</h3>
+        <h3 class="header-medium">Service Reports List</h3>
         <p class="text-sm md:text-base text-secondary">
-          Here you will see all your Job Sheets and be able to filter them!
+          Here you will see all your Service Reports and be able to filter them!
         </p>
       </div>
       <div class="md:ml-auto md:flex items-center gap-3">
@@ -123,10 +123,10 @@ function prevPage() {
       </div>
 
       <p v-if="jobSheetStore.jobSheets" class="subheader-small">
-        Showing {{ jobSheetStore.jobSheets?.length }} Job Sheet(s)
+        Showing {{ jobSheetStore.jobSheets?.length }} Service Report(s)
       </p>
       <button class="btn-sm-outline w-full md:w-auto" @click="addingjobSheet = true">
-        Add Job Sheet
+        Add Service Report
       </button>
     </div>
 
@@ -167,7 +167,7 @@ function prevPage() {
             class="btn-sm-outline md:w-auto w-full"
             @click="$router.push({ name: 'single-sheet', params: { id: jobSheet.id } })"
           >
-            View Sheet
+            View Report
           </button>
           <button
             v-if="jobSheet.id && userStore.loggedInUser?.role === 'ADMIN'"

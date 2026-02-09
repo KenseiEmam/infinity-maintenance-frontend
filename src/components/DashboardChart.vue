@@ -182,12 +182,12 @@ watch(range, () => {
 <template>
   <div class="w-full">
     <div class="flex items-center gap-3">
-      <h3 class="subheader-small">Jobs Overview</h3>
+      <h3 class="subheader-small text-left">Service Overview</h3>
 
       <div class="ml-auto flex gap-2">
         <button
           @click="range = 'past_year'"
-          class="btn-sm-outline"
+          class="btn-sm-outline text-xs md:text-base"
           :class="range === 'past_year' ? 'bg-primary text-white' : ''"
         >
           Past Year
@@ -195,7 +195,7 @@ watch(range, () => {
 
         <button
           @click="range = 'this_month'"
-          class="btn-sm-outline"
+          class="btn-sm-outline text-xs md:text-base"
           :class="range === 'this_month' ? 'bg-primary text-white' : ''"
         >
           This Month
@@ -203,7 +203,7 @@ watch(range, () => {
 
         <button
           @click="range = 'last_3_months'"
-          class="btn-sm-outline"
+          class="btn-sm-outline text-xs md:text-base"
           :class="range === 'last_3_months' ? 'bg-primary text-white' : ''"
         >
           3 Months

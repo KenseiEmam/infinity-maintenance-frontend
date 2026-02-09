@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import Vue3Signature from 'vue3-signature'
-
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import AddSparePartModal from '@/components/Modals/AddSparePartModal.vue'
 import AddLaserDataModal from '@/components/Modals/AddLaserDataModal.vue'
 
@@ -55,6 +55,112 @@ async function uploadFile(e: Event) {
   await jobSheetStore.uploadAttachment(file, jobSheetStore.jobSheetDetail.id)
   uploading.value = false
   input.value = ''
+}
+
+// PDF Generator
+async function generateServicePDF() {
+  const sheet = jobSheetStore.jobSheetDetail
+  if (!sheet) return
+  if (!sheet.createdAt) return
+  const pdfDoc = await PDFDocument.create()
+  const page = pdfDoc.addPage([595.28, 841.89]) // A4
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+
+  let y = 800
+  const lineHeight = 16
+
+  function draw(text: string, size = 11, bold = false) {
+    page.drawText(text ?? '-', {
+      x: 40,
+      y,
+      size,
+      font,
+      color: rgb(0, 0, 0),
+    })
+    y -= lineHeight
+    console.log(bold)
+  }
+
+  // ---- HEADER ----
+  draw('SERVICE REPORT', 16)
+  y -= 10
+
+  draw(`Sheet ID: ${sheet.id}`)
+  draw(`Date: ${new Date(sheet.createdAt).toLocaleDateString()}`)
+  draw(`Engineer: ${sheet.engineer?.name}`)
+  draw(`Customer: ${sheet.customer?.name}`)
+  draw(`Phone: ${sheet.customer?.phone}`)
+  draw(`Machine SN: ${sheet.machine?.serialNumber}`)
+  draw(`Warranty: ${sheet.machine?.underWarranty ? 'YES' : 'NO'}`)
+
+  y -= 10
+
+  // ---- TIME ----
+  draw('TIME DATA', 13)
+  draw(`Arrival: ${sheet.arrivalTime ?? '-'}`)
+  draw(`Completion: ${sheet.completionTime ?? '-'}`)
+  draw(`Labour: ${sheet.labourTimeMin ?? '-'} minutes`)
+
+  y -= 10
+
+  // ---- REPORT ----
+  draw('PROBLEM FOUND', 13)
+  draw(sheet.problemFound || '-')
+
+  y -= 5
+  draw('WORK REPORT', 13)
+  draw(sheet.workReport || '-')
+
+  y -= 10
+
+  // ---- SPARE PARTS ----
+  draw('SPARE PARTS', 13)
+
+  if (sheet.spareParts?.length) {
+    sheet.spareParts.forEach((sp) => {
+      draw(`${sp.itemName}  |  Qty: ${sp.quantity}  |  Price: ${sp.price}`)
+    })
+  } else {
+    draw('No spare parts')
+  }
+
+  y -= 5
+  draw(`Total: ${sparePartsTotal.value.toFixed(2)}`)
+
+  y -= 15
+
+  // ---- SIGNATURE ----
+  draw('CUSTOMER SIGNATURE', 13)
+
+  if (sheet.customerSignature) {
+    const png = sheet.customerSignature.split(',')[1]
+    if (!png) return
+    const imageBytes = Uint8Array.from(atob(png), (c) => c.charCodeAt(0))
+    const image = await pdfDoc.embedPng(imageBytes)
+
+    page.drawImage(image, {
+      x: 40,
+      y: y - 80,
+      width: 200,
+      height: 80,
+    })
+  } else {
+    draw('No signature provided')
+  }
+
+  // ---- SAVE ----
+  const pdfBytes = await pdfDoc.save()
+
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+  const url = URL.createObjectURL(blob)
+
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `ServiceReport-${sheet.id}.pdf`
+  a.click()
+
+  URL.revokeObjectURL(url)
 }
 
 // route
@@ -267,6 +373,30 @@ const handleEdit = () => {
             })
           }}
         </h3>
+        <div class="mb-4 flex gap-4 w-full">
+          <div class="flex-1">
+            <label for="disc"> Job Total</label>
+            <input
+              type="number"
+              v-model.number="jobSheetStore.jobSheetDetail.total"
+              placeholder="Total"
+              class="infinity-text-input flex-1"
+            />
+          </div>
+          <div class="flex-1">
+            <label>Service Type</label>
+            <select
+              v-model="jobSheetStore.jobSheetDetail.serviceType"
+              class="infinity-text-input flex-1"
+              required
+            >
+              <option value="" disabled>Select a Service Type</option>
+              <option value="INSTALLATION">INSTALLATION</option>
+              <option value="CONTRACT">CONTRACT</option>
+              <option value="PAID">PAID</option>
+            </select>
+          </div>
+        </div>
         <button
           v-if="jobSheetStore.jobSheetDetail.callId"
           class="btn-lg w-full"
@@ -278,6 +408,9 @@ const handleEdit = () => {
           "
         >
           Visit Related Call
+        </button>
+        <button class="btn-lg-outline w-full" @click="generateServicePDF">
+          Download Service Report PDF
         </button>
       </div>
       <!-- Supervising Engineer -->
@@ -303,24 +436,14 @@ const handleEdit = () => {
           {{ jobSheetStore.jobSheetDetail.customer.phone }}
         </p>
       </div>
+
       <!-- Time Data -->
-      <div class="card h-auto space-y-3 md:col-span-2 items-center md:items-start">
+      <div class="card h-auto space-y-3 items-center md:items-start">
         <h2 class="text-primary text-sm md:text-lg">
           <span class="font-black text-sm md:text-base">Time Data:</span>
         </h2>
 
         <div class="grid md:grid-cols-3 w-full gap-4">
-          <!-- Check In -->
-          <div class="space-y-2">
-            <label class="block text-sm font-medium">Check In Time</label>
-            <VueDatePicker
-              v-model="jobSheetStore.jobSheetDetail.checkInTime"
-              :enable-time-picker="true"
-              :teleport="true"
-              :clearable="true"
-            />
-          </div>
-
           <!-- Arrival -->
           <div class="space-y-2">
             <label class="block text-sm font-medium">Arrival Time</label>
@@ -399,33 +522,6 @@ const handleEdit = () => {
           ></textarea>
         </div>
       </div>
-      <!-- Finances  -->
-      <div class="card h-auto space-y-2 items-center md:items-start">
-        <h2 class="text-primary text-sm md:text-lg">
-          <span class="font-black text-sm md:text-base">Financials:</span>
-        </h2>
-        <div class="mb-4 flex gap-4">
-          <div class="flex-1">
-            <label for="disc"> Job Total</label>
-            <input
-              type="number"
-              v-model.number="jobSheetStore.jobSheetDetail.total"
-              placeholder="Total"
-              class="infinity-text-input flex-1"
-            />
-          </div>
-
-          <div class="flex-1">
-            <label for="disc"> After Discount</label>
-            <input
-              type="number"
-              v-model.number="jobSheetStore.jobSheetDetail.totalAfterDisc"
-              placeholder="Total After Discount"
-              class="infinity-text-input flex-1"
-            />
-          </div>
-        </div>
-      </div>
 
       <!-- Attachments -->
       <div class="card h-auto space-y-3 items-center md:items-start md:row-span-2">
@@ -469,7 +565,7 @@ const handleEdit = () => {
         <p v-else class="text-sm text-teritiary">No attachments uploaded</p>
       </div>
       <!-- Spare Parts -->
-      <div class="card h-auto space-y-3 items-center md:items-start md:row-span-2">
+      <div class="card h-auto space-y-3 items-center md:items-start md:row-span-2 md:col-span-2">
         <div class="flex items-center justify-between w-full gap-3">
           <h2 class="text-primary text-sm md:text-lg">
             <span class="font-black text-sm md:text-base">Spare Parts:</span>
@@ -490,7 +586,9 @@ const handleEdit = () => {
           >
             <div class="flex flex-col">
               <p class="font-bold">{{ sp.itemName }}</p>
-              <p class="text-sm text-teritiary">Qty: {{ sp.quantity }} | Price: {{ sp.price }}</p>
+              <p class="text-sm text-teritiary">
+                Qty: {{ sp.quantity }} | Price: {{ sp.price }} ({{ sp.discounted }})
+              </p>
             </div>
 
             <button class="btn-sm-outline w-24" @click="removeSparePart(idx)">Remove</button>

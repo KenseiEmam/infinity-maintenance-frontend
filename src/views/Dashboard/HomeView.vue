@@ -35,10 +35,10 @@ onMounted(() => {
           <div
             v-for="call in callStore.calls"
             :key="call.id"
-            class="snap-start shrink-0 w-[320px] md:w-[380px]"
+            class="snap-start shrink-0 w-[250px] md:w-[380px]"
           >
             <div class="card h-full space-y-2">
-              <h3 class="font-black text-primary">Call #{{ call.id }}</h3>
+              <h3 class="font-black text-primary text-sm">Call #{{ call.id }}</h3>
               <p class="text-sm text-teritiary">{{ call.customer?.name }}</p>
 
               <button
@@ -60,10 +60,10 @@ onMounted(() => {
           <div
             v-for="js in jobSheetStore.jobSheets"
             :key="js.id"
-            class="snap-start shrink-0 w-[320px] md:w-[380px]"
+            class="snap-start shrink-0 w-[250px] md:w-[380px]"
           >
             <div class="card h-full space-y-2">
-              <h3 class="font-black text-primary">Sheet #{{ js.id }}</h3>
+              <h3 class="font-black text-primary text-sm">Sheet #{{ js.id }}</h3>
               <p class="text-sm text-teritiary">{{ js.customer?.name }}</p>
 
               <button

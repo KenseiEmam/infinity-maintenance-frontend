@@ -4,6 +4,7 @@ import AddcallModal from '@/components/Modals/AddCallModal.vue'
 
 import AssignEngineerModal from '@/components/Modals/AssignEngineerModal.vue'
 import CallJobSheetModal from '@/components/Modals/CallJobSheetModal.vue'
+import router from '@/router'
 import { useCallStore } from '@/stores/callStore'
 import { useJobSheetStore } from '@/stores/jobSheetStore'
 import { onMounted, ref, watch, computed } from 'vue'
@@ -102,12 +103,10 @@ const handleAddJob = (event: any) => {
 
   jobSheetStore
     .createJobSheet(payload)
-    .then(() => {
+    .then((data: any) => {
       chosenCall.value = undefined
       modalLoad3.value = false
-      callStore.fetchCalls(page.value, pageSize.value).finally(() => {
-        loading.value = false
-      })
+      router.push({ name: 'single-sheet', params: { id: data.id } })
     })
     .catch(() => {
       modalLoad3.value = false
@@ -203,14 +202,14 @@ function prevPage() {
             <p class="text-teritiary text-sm">Assigned to: {{ call.assignedTo?.name }}</p>
 
             <button v-if="!call.jobSheet" class="btn-sm w-full" @click="chosenCall = call">
-              Create Job
+              Create Report
             </button>
             <button
               v-else
               class="btn-sm w-full"
               @click="$router.push({ name: 'single-sheet', params: { id: call.jobSheet.id } })"
             >
-              Visit Job
+              Visit Report
             </button>
           </div>
 

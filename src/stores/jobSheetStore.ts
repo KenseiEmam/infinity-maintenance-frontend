@@ -100,7 +100,7 @@ export const useJobSheetStore = defineStore('jobSheet', () => {
     try {
       const data = await jobSheetServices.createJobSheet(payload)
       jobSheets.value.unshift(data)
-      showSuccess('Job Sheet created')
+      showSuccess('Service Report created')
       return data
     } catch (err: any) {
       showError(getErrorMessage(err, 'Failed to create job sheet'))
@@ -113,7 +113,7 @@ export const useJobSheetStore = defineStore('jobSheet', () => {
       const index = jobSheets.value.findIndex((j) => j.id === id)
       if (index !== -1) jobSheets.value[index] = data
       if (jobSheetDetail.value?.id === id) jobSheetDetail.value = data
-      showSuccess('Job Sheet updated')
+      showSuccess('Service Report updated')
       return data
     } catch (err: any) {
       showError(getErrorMessage(err, 'Failed to update job sheet'))
@@ -125,7 +125,7 @@ export const useJobSheetStore = defineStore('jobSheet', () => {
       await jobSheetServices.deleteJobSheet(id)
       jobSheets.value = jobSheets.value.filter((j) => j.id !== id)
       if (jobSheetDetail.value?.id === id) jobSheetDetail.value = null
-      showSuccess('Job Sheet deleted')
+      showSuccess('Service Report deleted')
     } catch (err: any) {
       showError(getErrorMessage(err, 'Failed to delete job sheet'))
     }

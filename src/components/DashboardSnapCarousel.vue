@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto px-6 pb-6 overflow-hidden relative">
+  <div class="mx-auto px-6 pb-6 overflow-hidden relative max-w-[85vw] mx-auto">
     <!-- Left Fade -->
     <div
       class="absolute md:w-64 h-full bg-gradient-to-r dark:from-infin-darksecbg from-infin-secbg to-transparent left-0 z-20 pointer-events-none"

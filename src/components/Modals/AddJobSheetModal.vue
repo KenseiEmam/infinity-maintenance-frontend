@@ -30,6 +30,7 @@ const jobSheet = ref({
   machineId: '',
   engineerId: '',
   problemFound: '',
+  serviceType: '',
   workReport: '',
   total: 0,
   totalAfterDisc: 0,
@@ -55,7 +56,7 @@ const validateForm = () => {
   if (!jobSheet.value.customerId) errors.value.customerId = 'Customer is required'
   if (!jobSheet.value.machineId) errors.value.machineId = 'Machine is required'
   if (!jobSheet.value.engineerId) errors.value.engineerId = 'Engineer is required'
-
+  if (!jobSheet.value.serviceType) errors.value.serviceType = 'Service Type is required'
   return Object.keys(errors.value).length === 0
 }
 
@@ -72,6 +73,7 @@ const submitForm = () => {
     customerId: '',
     machineId: '',
     engineerId: '',
+    serviceType: '',
     problemFound: '',
     workReport: '',
     total: 0,
@@ -99,7 +101,7 @@ const submitForm = () => {
     </div>
 
     <div v-else class="card bg-primary-background rounded-lg shadow p-6 mx-3 w-full max-w-128">
-      <h2 class="contentH-small">Create Job Sheet</h2>
+      <h2 class="contentH-small">Create Service Report</h2>
       <p class="text-body mb-4">Fill in the required details to create a new job sheet.</p>
 
       <form @submit.prevent="submitForm" class="w-full gap-6">
@@ -111,7 +113,24 @@ const submitForm = () => {
             placeholder="Optional"
           />
         </div>
-
+        <div class="mb-4">
+          <label class="block text-sm font-medium">Service Type</label>
+          <select
+            v-model="jobSheet.serviceType"
+            class="infinity-text-input"
+            placeholder="Engineer ID"
+            :class="{ 'border-red-500': errors.serviceType }"
+            required
+          >
+            <option value="" disabled>Select a Service Type</option>
+            <option value="INSTALLATION">INSTALLATION</option>
+            <option value="CONTRACT">CONTRACT</option>
+            <option value="PAID">PAID</option>
+          </select>
+          <span v-if="errors.serviceType" class="text-red-500 text-sm">{{
+            errors.serviceType
+          }}</span>
+        </div>
         <div class="mb-4">
           <label class="block text-sm font-medium">Date</label>
           <input
@@ -206,23 +225,13 @@ const submitForm = () => {
               class="infinity-text-input flex-1"
             />
           </div>
-
-          <div class="flex-1">
-            <label for="disc"> After Discount</label>
-            <input
-              type="number"
-              v-model.number="jobSheet.totalAfterDisc"
-              placeholder="Total After Discount"
-              class="infinity-text-input flex-1"
-            />
-          </div>
         </div>
 
         <div class="gap-2 flex justify-end flex-col md:flex-row">
           <button type="button" @click="$emit('close')" class="btn-lg-outline rounded mr-2">
             Cancel
           </button>
-          <button type="submit" class="btn-lg rounded">Create Job Sheet</button>
+          <button type="submit" class="btn-lg rounded">Create Service Report</button>
         </div>
       </form>
     </div>

@@ -63,12 +63,15 @@ export const useMachineStore = defineStore('machine', () => {
 
   async function fetchMachines(filters: any = {}, page = 1, pageSize = 10) {
     try {
+      console.log('STORE RECEIVED PAGE =', page)
       const params: any = { page, pageSize }
 
       if (filters.role) params.role = filters.role
       if (filters.name) params.name = filters.name
       const data = await machineServices.fetchMachines(params)
-      machines.value = data
+      machines.value = data.machines
+      totalCount.value = data.count
+      console.log('BACKEND RETURNED PAGE =', data.machines.page)
     } catch (err: any) {
       showError(err?.response?.data?.error || 'Failed to fetch machines')
     }

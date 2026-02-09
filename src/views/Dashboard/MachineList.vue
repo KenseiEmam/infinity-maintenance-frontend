@@ -40,11 +40,12 @@ function changeFilter($event: any) {
 }
 // Fetch machines whenever filter or page changes
 watch(
-  [filter, page],
+  () => [filter.value.type, page.value],
   () => {
+    console.log('FETCH PAGE =', page.value)
     loading.value = true
     if (filter.value.type === 'Machines')
-      machineStore.fetchMachines(page.value, pageSize.value).finally(() => {
+      machineStore.fetchMachines({}, page.value, pageSize.value).finally(() => {
         loading.value = false
       })
     else if (filter.value.type === 'Models')
@@ -56,12 +57,12 @@ watch(
         loading.value = false
       })
   },
-  { deep: true },
 )
 
 onMounted(() => {
   loading.value = true
-  machineStore.fetchMachines(page.value, pageSize.value).finally(() => {
+  console.log('PAGE BEFORE FETCH =', page.value)
+  machineStore.fetchMachines({}, page.value, pageSize.value).finally(() => {
     machineStore.fetchManufacturers().finally(() => {
       machineStore.fetchModels().finally(() => {
         customerStore.fetchCustomers(1, 100000).finally(() => {
@@ -82,7 +83,7 @@ async function handleDelete(id: string) {
     if (result.isConfirmed) {
       loading.value = true
       await machineStore.deleteMachine(id).then(() => {
-        machineStore.fetchMachines(page.value, pageSize.value).finally(() => {
+        machineStore.fetchMachines({}, page.value, pageSize.value).finally(() => {
           loading.value = false
         })
       })
@@ -95,7 +96,7 @@ const handleAdd = (event: any) => {
   machineStore.createMachine(event).then(() => {
     addingMachine.value = false
     modalLoad.value = false
-    machineStore.fetchMachines(page.value, pageSize.value).finally(() => {
+    machineStore.fetchMachines({}, page.value, pageSize.value).finally(() => {
       loading.value = false
     })
   })
@@ -129,7 +130,7 @@ const handleEdit = (event: any) => {
   machineStore.updateMachine(event.id, event).then(() => {
     editMachine.value = null
     modalLoad2.value = false
-    machineStore.fetchMachines(page.value, pageSize.value).finally(() => {
+    machineStore.fetchMachines({}, page.value, pageSize.value).finally(() => {
       loading.value = false
     })
   })

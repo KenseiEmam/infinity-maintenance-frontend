@@ -61,7 +61,7 @@
             />
           </svg>
 
-          <p>Job Sheets</p>
+          <p>Service Reports</p>
         </RouterLink>
         <RouterLink :to="{ name: 'calls' }" class="flex gap-4 items-center hover:opacity-60">
           <svg
@@ -172,7 +172,7 @@
         <nav
           v-show="isMobileMenuOpen"
           id="mobile-nav"
-          class="mobile-nav card absolute z-50 top-16 left-5 right-5 bg-secondary-background p-4 my-4 rounded-lg"
+          class="mobile-nav card fixed z-50 top-16 left-5 right-5 bg-secondary-background p-4 my-4 rounded-lg"
           role="navigation"
           aria-label="Mobile Navigation"
         >
@@ -191,7 +191,7 @@
             <RouterLink
               :to="{ name: 'job-sheets' }"
               class="text-base block py-2 btn-lg-outline text-center"
-              >Job Sheets</RouterLink
+              >Service Reports</RouterLink
             >
             <RouterLink
               :to="{ name: 'calls' }"
