@@ -88,6 +88,7 @@ async function generateServicePDF() {
 
   draw(`Sheet ID: ${sheet.id}`)
   draw(`Date: ${new Date(sheet.createdAt).toLocaleDateString()}`)
+  draw(`Service Type: ${sheet.engineer?.serviceType}`)
   draw(`Engineer: ${sheet.engineer?.name}`)
   draw(`Customer: ${sheet.customer?.name}`)
   draw(`Phone: ${sheet.customer?.phone}`)
@@ -112,7 +113,7 @@ async function generateServicePDF() {
   draw('WORK REPORT', 13)
   draw(sheet.workReport || '-')
 
-  y -= 10
+  y -= 100
 
   // ---- SPARE PARTS ----
   draw('SPARE PARTS', 13)
@@ -125,8 +126,20 @@ async function generateServicePDF() {
     draw('No spare parts')
   }
 
-  y -= 5
-  draw(`Total: ${sparePartsTotal.value.toFixed(2)}`)
+  y -= 20
+
+  // ---- LASER DATA ----
+  draw('LASER DATA', 13)
+
+  if (sheet.laserData?.length) {
+    sheet.laserData.forEach((sp) => {
+      draw(`${sp.laserType}  |  Lamp: ${sp.lampCounter}  |  Voltage: ${sp.voltage}`)
+    })
+  } else {
+    draw('No laser data')
+  }
+
+  y -= 20
 
   y -= 15
 
