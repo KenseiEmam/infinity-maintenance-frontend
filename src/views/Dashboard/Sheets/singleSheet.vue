@@ -290,42 +290,28 @@ async function generateServicePDF() {
     color: rgb(0, 0, 0),
   })
 
-  // ---- SAVE ----
+  // ================= SAVE PDF =================
   const pdfBytes = await pdfDoc.save()
-
-  // Convert to proper ArrayBuffer
-  // FIX TYPE ERROR HERE
-  const buffer = new ArrayBuffer(pdfBytes.length)
-  new Uint8Array(buffer).set(pdfBytes)
-
-  const blob = new Blob([buffer], { type: 'application/pdf' })
-  const url = URL.createObjectURL(blob)
-
-  const a = document.createElement('a')
-  a.href = url
-
-  a.click()
-
-  URL.revokeObjectURL(url)
-  // Add this at the end of generateServicePDF()
-  return pdfBytes
+  return pdfBytes // Uint8Array directly
 }
 
 async function shareJobSheet() {
   const sheet = jobSheetStore.jobSheetDetail
   if (!sheet) return
 
-  // Generate PDF and get bytes
+  // Generate PDF
   const pdfBytes = await generateServicePDF()
   if (!pdfBytes) return
 
-  // Wrap in Uint8Array to satisfy Blob
+  // Wrap in Uint8Array
   const uint8 = new Uint8Array(pdfBytes)
 
+  // Create proper PDF file
   const file = new File([uint8], `ServiceReport-${sheet.id}.pdf`, {
-    type: 'application/pdf',
+    type: 'application/pdf', // ensures it's recognized as PDF
   })
 
+  // Check if sharing supports files
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     await navigator.share({
       title: `Service Report ${sheet.id}`,
@@ -333,6 +319,14 @@ async function shareJobSheet() {
       files: [file],
     })
   } else {
+    // Fallback: download PDF
+    const blob = new Blob([file], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `ServiceReport-${sheet.id}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
     alert('Native share not supported. PDF downloaded instead.')
   }
 }
