@@ -118,11 +118,12 @@ async function generateServicePDF() {
     const logoBytes = await fetch(logoUrl).then((r) => r.arrayBuffer())
     const logo = await pdfDoc.embedPng(logoBytes)
 
-    page.drawImage(logo, { x: 40, y: height - 80, height: 40, width: 20 })
+    page.drawImage(logo, { x: 40, y: height - 70, height: 40, width: 20 })
   } catch {}
 
-  text('INFINITY', 70, height - 55, 16, true)
-  text('MEDICALS', 70, height - 75, 16, true)
+  text('INFINITY', 70, height - 45, 16, true)
+  text('MEDICALS', 70, height - 60, 16, true)
+  text(`Sheet ID: ${sheet.id || '-'}`, 70, height - 75)
   text('SERVICE REPORT', 320, height - 45, 13, true)
   text('Phone/Fax:(+965)2261 47 67', 320, height - 55, 9)
   text('Mob:(+965)50553092', 320, height - 65, 9)
@@ -138,8 +139,7 @@ async function generateServicePDF() {
   box(40, y - 80, width - 80, 80)
   text(`Date: ${new Date(sheet.createdAt).toLocaleDateString()}`, 50, y - 20)
   text(`Service Engineer: ${sheet.engineer?.name ?? '-'}`, 50, y - 35)
-  text(`Order Number: ${sheet.purchaseOrderNo ?? '-'}`, 50, y - 65)
-  const serviceTypes = ['INSTALLATION', 'CONTRACT', 'WARRANTY', 'PAID']
+  const serviceTypes = ['INSTALLATION', 'CONTRACT', 'WARRANTY', 'PAID SERVICE']
   const boxSize = 10
   const startX = 300
   let boxY = y - 10
@@ -154,7 +154,16 @@ async function generateServicePDF() {
       borderWidth: 1,
       borderColor: rgb(0, 0, 0),
     })
-
+    if (sheet.serviceType === 'PAID')
+      if (type === 'PAID SERVICE') {
+        page.drawText('X', {
+          x: startX + 1,
+          y: boxY - boxSize + 3,
+          size: 12,
+          font: bold,
+          color: rgb(0, 0, 0),
+        })
+      }
     // If this is the selected service type, add a checkmark
     if (sheet.serviceType === type) {
       page.drawText('X', {
@@ -186,7 +195,7 @@ async function generateServicePDF() {
   text('Customer Information:', 50, y - 20, 10, true)
   text(`Customer: ${sheet.customer?.name ?? '-'}`, 50, y - 35)
   text(`Phone: ${sheet.customer?.phone ?? '-'}`, 50, y - 50)
-  text(`Address: ${sheet.customer?.address ?? '-'}`, 50, y - 65)
+  text(`Address: ${sheet.customer?.address || '-'}`, 50, y - 65)
   text('Machine Information:', 320, y - 20, 10, true)
   text(`Machine SN: ${sheet.machine?.serialNumber ?? '-'}`, 320, y - 35)
   text(`Model: ${sheet.machine?.model?.name ?? '-'}`, 320, y - 50)
@@ -246,10 +255,16 @@ async function generateServicePDF() {
   y -= 35
 
   // ================= SIGNATURE =================
-  box(40, y - 70, width - 80, 70)
-  text('Customer Signature', 60, y - 15, 10, true)
-  text('Engineer Signature', 350, y - 15, 10, true)
-
+  box(40, y - 90, width - 80, 90)
+  text(`Customer Name:${sheet.customer.name}`, 60, y - 15, 10, true)
+  text('Customer Signature', 60, y - 30, 10, true)
+  text(
+    `Signed Date: ${new Date(sheet.completionTime || '01/01/1977').toLocaleDateString()}`,
+    350,
+    y - 15,
+    10,
+    true,
+  )
   if (sheet.customerSignature) {
     const png = sheet.customerSignature.split(',')[1]
     if (png) {
@@ -258,43 +273,17 @@ async function generateServicePDF() {
 
       page.drawImage(image, {
         x: 60,
-        y: safeY(y - 60),
+        y: safeY(y - 75),
         width: 180,
         height: 35,
       })
     }
   }
 
-  page.drawLine({
-    start: { x: 350, y: safeY(y - 50) },
-    end: { x: 540, y: safeY(y - 50) },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  })
-  y -= 100
-
-  // ================= SIGNATURE =================
-  box(40, y - 70, width - 80, 70)
-  text('Customer Name:', 60, y - 15, 10, true)
-  text('Signed Date:', 350, y - 15, 10, true)
-  page.drawLine({
-    start: { x: 60, y: safeY(y - 50) },
-    end: { x: 250, y: safeY(y - 50) },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  })
-  page.drawLine({
-    start: { x: 350, y: safeY(y - 50) },
-    end: { x: 540, y: safeY(y - 50) },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  })
-
   // ================= SAVE PDF =================
   const pdfBytes = await pdfDoc.save()
   return pdfBytes // Uint8Array directly
 }
-
 async function shareJobSheet() {
   const sheet = jobSheetStore.jobSheetDetail
   if (!sheet) return
@@ -302,9 +291,18 @@ async function shareJobSheet() {
   // Generate PDF
   const pdfBytes = await generateServicePDF()
   if (!pdfBytes) return
-
   // Wrap in Uint8Array
   const uint8 = new Uint8Array(pdfBytes)
+
+  // Create a Blob for PDF
+  const blob = new Blob([uint8], { type: 'application/pdf' })
+  const url = URL.createObjectURL(blob)
+
+  // DEV: Open in a new tab
+  if (import.meta.env.DEV) {
+    window.open(url, '_blank')
+    return
+  }
 
   // Create proper PDF file
   const file = new File([uint8], `ServiceReport-${sheet.id}.pdf`, {
@@ -329,6 +327,8 @@ async function shareJobSheet() {
     URL.revokeObjectURL(url)
     alert('Native share not supported. PDF downloaded instead.')
   }
+  // Cleanup
+  URL.revokeObjectURL(url)
 }
 
 // route
@@ -519,11 +519,10 @@ const handleEdit = () => {
       <!-- Sheet ID -->
       <div class="card h-auto md:col-span-2 space-y-2">
         <h2 class="header-small text-left">
-          <span class="font-black text-sm md:text-base">Purchase Order Number:</span
-          >{{
-            jobSheetStore.jobSheetDetail.purchaseOrderNo ||
-            'sheet-id-' + jobSheetStore.jobSheetDetail.id
-          }}
+          <span class="font-black text-sm md:text-base">{{
+            jobSheetStore.jobSheetDetail.purchaseOrderNo ? 'Purchase Order Number:' : 'Sheet ID:'
+          }}</span
+          >{{ jobSheetStore.jobSheetDetail.purchaseOrderNo || jobSheetStore.jobSheetDetail.id }}
         </h2>
         <h3 v-if="jobSheetStore.jobSheetDetail.createdAt" class="text-teritiary text-sm">
           <span class="font-bold">Created:</span
@@ -546,20 +545,11 @@ const handleEdit = () => {
           }}
         </h3>
         <div class="mb-4 flex gap-4 w-full">
-          <div class="flex-1">
-            <label for="disc"> Job Total</label>
-            <input
-              type="number"
-              v-model.number="jobSheetStore.jobSheetDetail.total"
-              placeholder="Total"
-              class="infinity-text-input flex-1"
-            />
-          </div>
-          <div class="flex-1">
+          <div class="">
             <label>Service Type</label>
             <select
               v-model="jobSheetStore.jobSheetDetail.serviceType"
-              class="infinity-text-input flex-1"
+              class="infinity-text-input"
               required
             >
               <option value="" disabled>Select a Service Type</option>
@@ -664,7 +654,13 @@ const handleEdit = () => {
           <span class="font-black text-sm md:text-base">Machine:</span>
         </h2>
         <h2 class="text-primary text-sm md:text-lg">
-          {{ jobSheetStore.jobSheetDetail.machine.serialNumber }}
+          Serial Number: {{ jobSheetStore.jobSheetDetail.machine.serialNumber }}
+        </h2>
+        <h2 class="text-primary text-sm md:text-lg">
+          Model: {{ jobSheetStore.jobSheetDetail.machine.model?.name }}
+        </h2>
+        <h2 class="text-primary text-sm md:text-lg">
+          Manufacturer: {{ jobSheetStore.jobSheetDetail.machine.model?.manufacturer?.name }}
         </h2>
         <p>
           {{

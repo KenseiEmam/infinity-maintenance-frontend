@@ -24,7 +24,7 @@ onMounted(() => {
   <section class="container flex flex-col h-screen items-center justify-center gap-4">
     <div class="card text-center items-center w-full">
       <img src="@/assets/logo.png" class="w-12 mb-3" alt="" />
-      <h1 class="title-small">INTFINITY MEDICALS</h1>
+      <h1 class="title-small">INFINITY MEDICALS</h1>
       <p class="header-medium">Service Portal</p>
     </div>
     <div v-if="loading" class="card text-center items-center w-full space-y-4">

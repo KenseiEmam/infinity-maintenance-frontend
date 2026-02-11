@@ -10,7 +10,8 @@ const props = defineProps({
 })
 
 const emits = defineEmits(['close', 'submit'])
-
+const selectedManufacturer = ref('')
+const selectedModel = ref('')
 const customerStore = useCustomerStore()
 const machineStore = useMachineStore()
 
@@ -28,18 +29,31 @@ const callForm = ref({
 const errors = ref<any>({})
 
 onMounted(async () => {
-  await customerStore.fetchCustomers()
-  loadData.value = false
+  customerStore.fetchCustomers().then(() => {
+    machineStore.fetchManufacturers().then(() => {
+      loadData.value = false
+    })
+  })
 })
-
 watch(
-  () => callForm.value.customerId,
-  async (id) => {
-    if (!id) return
+  () => selectedManufacturer.value,
+  (id) => {
     loadMachines.value = true
-    await machineStore.fetchMachines({ customerId: id })
-    loadMachines.value = false
+    machineStore.fetchModels(id).finally(() => {
+      loadMachines.value = false
+    })
   },
+  { deep: true },
+)
+watch(
+  () => [callForm.value.customerId, selectedModel.value],
+  ([id, secondid]) => {
+    loadMachines.value = true
+    machineStore.fetchMachines({ customerId: id, modelId: secondid }).finally(() => {
+      loadMachines.value = false
+    })
+  },
+  { deep: true },
 )
 
 // Validation
@@ -112,14 +126,37 @@ const submitForm = () => {
             {{ errors.customerId }}
           </span>
         </div>
-
+        <!-- Manufacturer -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium">Manufacturer </label>
+          <select v-model="selectedManufacturer" class="infinity-text-input">
+            <option value="">No Manufacturer</option>
+            <option
+              v-for="manufacturer in machineStore.manufacturers"
+              :key="manufacturer.id"
+              :value="manufacturer.id"
+            >
+              {{ manufacturer.name }}
+            </option>
+          </select>
+        </div>
+        <!-- Model -->
+        <div v-if="selectedManufacturer" class="mb-4">
+          <label class="block text-sm font-medium">Models </label>
+          <select v-model="selectedModel" class="infinity-text-input">
+            <option value="">No Model</option>
+            <option v-for="model in machineStore.models" :key="model.id" :value="model.id">
+              {{ model.name }} | {{ model.manufacturer?.name }}
+            </option>
+          </select>
+        </div>
         <!-- Machine -->
-        <div v-if="callForm.customerId" class="mb-4">
-          <label class="block text-sm font-medium">Machine (optional)</label>
+        <div v-if="callForm.customerId && selectedModel" class="mb-4">
+          <label class="block text-sm font-medium">Machines</label>
           <select v-model="callForm.machineId" class="infinity-text-input">
             <option value="">No machine</option>
             <option v-for="machine in machineStore.machines" :key="machine.id" :value="machine.id">
-              {{ machine.model.name }} — {{ machine.serialNumber }}
+              {{ machine.serialNumber }} | {{ machine.model.name }}
             </option>
           </select>
         </div>

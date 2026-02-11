@@ -95,7 +95,7 @@ const router = createRouter({
         {
           name: 'machines',
           path: 'machines',
-          meta: { requiresAdmin: true },
+          meta: { requiresAuth: true },
           component: MachineList,
         },
       ],

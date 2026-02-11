@@ -17,11 +17,14 @@ const emits = defineEmits(['close', 'submit'])
 onMounted(() => {
   customerStore.fetchCustomers().then(() => {
     userStore.fetchUsers({}).then(() => {
-      loadEng.value = false
+      machineStore.fetchManufacturers().then(() => {
+        loadEng.value = false
+      })
     })
   })
 })
-
+const selectedManufacturer = ref('')
+const selectedModel = ref('')
 // JobSheet form
 const jobSheet = ref({
   purchaseOrderNo: '',
@@ -38,10 +41,20 @@ const jobSheet = ref({
   laserData: [] as any[],
 })
 watch(
-  () => jobSheet.value.customerId,
+  () => selectedManufacturer.value,
   (id) => {
     loadMachines.value = true
-    machineStore.fetchMachines({ customerId: id }).finally(() => {
+    machineStore.fetchModels(id).finally(() => {
+      loadMachines.value = false
+    })
+  },
+  { deep: true },
+)
+watch(
+  () => [jobSheet.value.customerId, selectedModel.value],
+  ([id, secondid]) => {
+    loadMachines.value = true
+    machineStore.fetchMachines({ customerId: id, modelId: secondid }).finally(() => {
       loadMachines.value = false
     })
   },
@@ -164,9 +177,32 @@ const submitForm = () => {
           </select>
           <span v-if="errors.customerId" class="text-red-500 text-sm">{{ errors.customerId }}</span>
         </div>
-
-        <div v-if="jobSheet.customerId" class="mb-4">
-          <label class="block text-sm font-medium">Machine ID</label>
+        <!-- Manufacturer -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium">Manufacturer </label>
+          <select v-model="selectedManufacturer" class="infinity-text-input">
+            <option value="">No Manufacturer</option>
+            <option
+              v-for="manufacturer in machineStore.manufacturers"
+              :key="manufacturer.id"
+              :value="manufacturer.id"
+            >
+              {{ manufacturer.name }}
+            </option>
+          </select>
+        </div>
+        <!-- Model -->
+        <div v-if="selectedManufacturer" class="mb-4">
+          <label class="block text-sm font-medium">Models </label>
+          <select v-model="selectedModel" class="infinity-text-input">
+            <option value="">No Model</option>
+            <option v-for="model in machineStore.models" :key="model.id" :value="model.id">
+              {{ model.name }} | {{ model.manufacturer?.name }}
+            </option>
+          </select>
+        </div>
+        <div v-if="jobSheet.customerId && selectedModel" class="mb-4">
+          <label class="block text-sm font-medium">Available Machines</label>
           <select
             v-model="jobSheet.machineId"
             class="infinity-text-input"
@@ -176,7 +212,8 @@ const submitForm = () => {
           >
             <option value="" disabled>Select a Machine</option>
             <option v-for="machine in machineStore.machines" :key="machine.id" :value="machine.id">
-              {{ machine.model.name }}
+              {{ machine.serialNumber }} | {{ machine.model.name }}
+              {{ machine.model.manufacturer.name }}
             </option>
           </select>
           <span v-if="errors.machineId" class="text-red-500 text-sm">{{ errors.machineId }}</span>
@@ -214,18 +251,6 @@ const submitForm = () => {
             class="infinity-text-input"
             placeholder="Optional"
           ></textarea>
-        </div>
-
-        <div class="mb-4 flex gap-4">
-          <div class="flex-1">
-            <label for="disc"> Job Total</label>
-            <input
-              type="number"
-              v-model.number="jobSheet.total"
-              placeholder="Total"
-              class="infinity-text-input flex-1"
-            />
-          </div>
         </div>
 
         <div class="gap-2 flex justify-end flex-col md:flex-row">

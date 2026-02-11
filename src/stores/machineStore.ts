@@ -68,6 +68,7 @@ export const useMachineStore = defineStore('machine', () => {
 
       if (filters.role) params.role = filters.role
       if (filters.name) params.name = filters.name
+      if (filters.customerId) params.customerId = filters.customerId
       const data = await machineServices.fetchMachines(params)
       machines.value = data.machines
       totalCount.value = data.count

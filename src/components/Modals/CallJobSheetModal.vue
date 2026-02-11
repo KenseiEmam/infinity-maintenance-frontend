@@ -18,7 +18,9 @@ const emits = defineEmits(['close', 'submit'])
 onMounted(() => {
   customerStore.fetchCustomers().then(() => {
     userStore.fetchUsers({}).then(() => {
-      loadEng.value = false
+      machineStore.fetchManufacturers().then(() => {
+        loadEng.value = false
+      })
     })
   })
 })
@@ -174,18 +176,6 @@ const submitForm = () => {
             class="infinity-text-input"
             placeholder="Optional"
           ></textarea>
-        </div>
-
-        <div class="mb-4 flex gap-4">
-          <div class="flex-1">
-            <label for="disc"> Job Total</label>
-            <input
-              type="number"
-              v-model.number="jobSheet.total"
-              placeholder="Total"
-              class="infinity-text-input flex-1"
-            />
-          </div>
         </div>
 
         <div class="gap-2 flex justify-end flex-col md:flex-row">
