@@ -226,10 +226,25 @@ async function generateServicePDF() {
   let sum = 0
   if (sheet.spareParts?.length) {
     sheet.spareParts.forEach((sp) => {
-      y = row([sp.itemName ?? '-', String(sp.quantity), String(sp.price)], spX, y)
-      sum += sp.price
+      const price = Number(sp.price) || 0
+      const discount = Number(sp.discounted) || 0
+      const qty = Number(sp.quantity) || 0
+      const finalPrice = Math.max(price - discount, 0)
+
+      y = row(
+        [
+          sp.itemName ?? '-',
+          String(qty),
+          `${finalPrice.toFixed(2)} ${discount ? `(discount -${discount.toFixed(2)})` : ''}`,
+        ],
+        spX,
+        y,
+      )
+
+      sum += finalPrice * qty
     })
-    y = row(['Total Price', '', sum + ''], spX, y)
+
+    y = row(['Total Price', '', sum.toFixed(2)], spX, y)
   } else {
     y = row(['No spare parts', '', ''], spX, y)
   }
@@ -405,10 +420,15 @@ const handleReset = () => {
 // ---- totals ----
 const sparePartsTotal = computed(() => {
   const parts = jobSheetStore.jobSheetDetail?.spareParts || []
-  return parts.reduce(
-    (sum: number, sp: any) => sum + (Number(sp.price) || 0) * (Number(sp.quantity) || 0),
-    0,
-  )
+
+  return parts.reduce((sum: number, sp: any) => {
+    const price = Number(sp.price) || 0
+    const discount = Number(sp.discounted) || 0
+    const qty = Number(sp.quantity) || 0
+
+    const finalPrice = Math.max(price - discount, 0) // prevent negative
+    return sum + finalPrice * qty
+  }, 0)
 })
 
 // ---- add spare part ----
@@ -421,6 +441,8 @@ const handleAddSparePart = (payload: any) => {
     itemName: payload.itemName,
     quantity: payload.quantity,
     price: payload.price,
+
+    discounted: payload.discounted,
   })
 
   addSparePartOpen.value = false
@@ -475,6 +497,7 @@ const handleEdit = () => {
         itemName: sp.itemName,
         quantity: sp.quantity,
         price: sp.price,
+        discounted: sp.discounted,
       })) || [],
 
     laserData:
@@ -756,7 +779,8 @@ const handleEdit = () => {
             <div class="flex flex-col">
               <p class="font-bold">{{ sp.itemName }}</p>
               <p class="text-sm text-teritiary">
-                Qty: {{ sp.quantity }} | Price: {{ sp.price }} ({{ sp.discounted }})
+                Qty: {{ sp.quantity }} | Unit: {{ (sp.price - (sp.discounted || 0)).toFixed(2) }}
+                <span v-if="sp.discounted"> (Discount -{{ sp.discounted.toFixed(2) }})</span>
               </p>
             </div>
 

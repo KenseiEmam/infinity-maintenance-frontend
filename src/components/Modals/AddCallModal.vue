@@ -128,7 +128,7 @@ const submitForm = () => {
         </div>
         <!-- Manufacturer -->
         <div class="mb-4">
-          <label class="block text-sm font-medium">Manufacturer </label>
+          <label class="block text-sm font-medium">Manufacturer (Optional)</label>
           <select v-model="selectedManufacturer" class="infinity-text-input">
             <option value="">No Manufacturer</option>
             <option

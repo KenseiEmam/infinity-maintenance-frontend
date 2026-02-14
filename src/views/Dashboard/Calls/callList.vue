@@ -117,6 +117,7 @@ const handleAddJob = (event: any) => {
 const handleAdd = (event: any) => {
   loading.value = true
   modalLoad.value = true
+  if (!event.machineId) event.machineId = null
   callStore.createCall(event).then(() => {
     addingcall.value = false
     modalLoad.value = false

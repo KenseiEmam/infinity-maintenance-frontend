@@ -30,7 +30,15 @@ const validateForm = () => {
     sparePart.value.price < 0
   )
     errors.value.price = 'Price required'
+  if (
+    sparePart.value.discounted !== null &&
+    sparePart.value.discounted !== undefined &&
+    sparePart.value.discounted < 0
+  )
+    errors.value.discounted = 'Discount cannot be negative'
 
+  if (sparePart.value.discounted !== null && sparePart.value.discounted > sparePart.value.price)
+    errors.value.discounted = 'Discount cannot exceed price'
   return Object.keys(errors.value).length === 0
 }
 
@@ -41,6 +49,10 @@ const submitForm = () => {
     itemName: sparePart.value.itemName,
     quantity: Number(sparePart.value.quantity),
     price: Number(sparePart.value.price),
+    discounted:
+      sparePart.value.discounted !== null && sparePart.value.discounted !== undefined
+        ? Number(sparePart.value.discounted)
+        : null,
   })
 
   sparePart.value = {
@@ -97,13 +109,16 @@ const submitForm = () => {
           </span>
         </div>
         <div>
-          <label class="block text-sm font-medium">Discounted Price</label>
+          <label class="block text-sm font-medium">Unit Discounted (reduced from price)</label>
           <input
             type="number"
             placeholder="No Discount"
             v-model.number="sparePart.discounted"
             class="infinity-text-input"
           />
+          <span v-if="errors.discounted" class="text-red-500 text-sm">
+            {{ errors.discounted }}
+          </span>
         </div>
         <div class="flex justify-end gap-2 pt-4">
           <button type="button" class="btn-lg-outline" @click="$emit('close')">Cancel</button>
