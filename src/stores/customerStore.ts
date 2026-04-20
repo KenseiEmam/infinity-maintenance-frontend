@@ -47,7 +47,7 @@ export const useCustomerStore = defineStore('customer', () => {
 
   /* ================= CRUD ================= */
 
-  async function fetchCustomers(page = 1, pageSize = 10) {
+  async function fetchCustomers(page = 1, pageSize = 1000) {
     try {
       const data = await customerServices.fetchCustomers(page, pageSize)
       customers.value = data.customers
